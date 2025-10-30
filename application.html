@@ -12,6 +12,14 @@
     
 </head>
 <body>
+    <script>
+  function sendHeight() {
+    parent.postMessage(document.body.scrollHeight, '*');
+  }
+  window.onload = sendHeight;
+  window.onresize = sendHeight;
+</script>
+
     <div class="container">
         <!-- Header -->
         <div class="header-section">

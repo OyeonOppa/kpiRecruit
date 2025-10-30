@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบรับสมัครงานออนไลน์ - สถาบันพระปกเกล้า</title>
+    
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    
+    <!-- SweetAlert2 CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header with Logo -->
+      <div class="header-section">
+        <div class="logo-container">
+          <img 
+            id="orgLogo" 
+            src="KPI LOGO.png" 
+            alt="สถาบันพระปกเกล้า" 
+            class="org-logo" 
+          />
+        </div>
+        <h1 class="main-title">ระบบรับสมัครงานออนไลน์</h1>
+        <p class="subtitle">สถาบันพระปกเกล้า</p>
+      </div>
+
+      <!-- Consent Form Card -->
+      <div class="consent-card">
+        <div class="consent-header">
+          <h2>หนังสือยินยอมให้ใช้หรือเปิดเผยข้อมูลส่วนบุคคลของผู้สมัคร</h2>
+        </div>
+
+        <div class="consent-body">
+          <div class="consent-content">
+            <p class="consent-intro">
+              เพื่อประโยชน์ในการปฏิบัติตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 
+              ข้าพเจ้าขอแจ้งความประสงค์ไว้ ณ ที่นี้ว่า เอกสารนี้เป็นข้อมูลส่วนบุคคลของข้าพเจ้า อันเป็นการบ่งชี้ตัวของข้าพเจ้า
+              ที่อยู่ในครอบครองของสถาบันพระปกเกล้านี้ ในกรณีที่มีผู้อื่นมาขอตรวจสอบ หรือขอคัดสำเนาเอกสารดังกล่าว ดังนี้
+            </p>
+
+            <div class="consent-details">
+              <div class="section">
+                <span class="section-number">1</span>
+                <strong>ข้าพเจ้ายินยอมให้ใช้หรือเปิดเผยข้อมูลส่วนบุคคลที่เกี่ยวข้องกับข้าพเจ้า</strong>
+                <div class="section-content">
+                  สำหรับให้สถาบันพระปกเกล้าตรวจสอบและพิจารณาว่ามีความเหมาะสมกับตำแหน่งงานที่ทางสถาบันฯ เปิดรับสมัคร
+                </div>
+              </div>
+
+              <div class="section">
+                <span class="section-number">2</span>
+                <strong>ข้าพเจ้ายินยอมให้สถาบันพระปกเกล้า</strong>
+                <div class="section-content">
+                  เก็บข้อมูลส่วนบุคคล ตรวจสอบประวัติส่วนบุคคล ประวัติอาชญากรรม หรือประวัติประสบการณ์การทำงานที่ผ่านมาของข้าพเจ้าไปยังบุคคล และ/หรือหน่วยงานต่างๆ ที่เกี่ยวข้อง เพื่อเป็นข้อมูลประกอบการพิจารณาการคัดเลือกตามตำแหน่งที่ข้าพเจ้าสมัคร โดยข้าพเจ้ายินยอมให้เปิดเผยข้อมูลหรือยื่นคำขอในลักษณะใดในสมัครงานของสถาบันพระปกเกล้า
+                </div>
+              </div>
+
+              <div class="section">
+                <span class="section-number">3</span>
+                <strong>ข้อมูลส่วนบุคคลที่สถาบันพระปกเกล้าเก็บรวบรวมในครั้งนี้</strong>
+                <div class="section-content">
+                  สถาบันฯ จะใช้วิธีการที่ชอบด้วยกฎหมายและเป็นธรรมในการเก็บรวบรวมข้อมูลส่วนบุคคลอย่างจำกัดเพียงเท่าที่จำเป็นภายใต้วัตถุประสงค์การทำงานของสถาบันพระปกเกล้า เพื่อใช้เป็นข้อมูลประกอบการพิจารณาคัดเลือกตามตำแหน่งที่ผู้ให้ข้อมูลประสงค์จะสมัครับการคัดเลือก โดยจะเก็บไว้เป็นเวลา <span class="highlight">1 ปี</span>
+                </div>
+              </div>
+
+              <div class="section">
+                <span class="section-number">4</span>
+                <strong>วัตถุประสงค์ในการเก็บรวบรวมข้อมูลส่วนบุคคล</strong>
+                
+                <div class="subsection">
+                  <div class="subsection-title">4.1 สถาบันพระปกเกล้าจะเก็บรวบรวมข้อมูลส่วนบุคคลของท่าน</div>
+                  <div class="section-content">
+                    เพื่อนำไปใช้หรือเปิดเผยเท่าที่จำเป็นภายใต้วัตถุประสงค์ในการใช้ประกอบการพิจารณาคัดเลือกตามตำแหน่งที่ผู้ให้ข้อมูลแสดงความประสงค์เท่านั้น
+                  </div>
+                </div>
+
+                <div class="subsection">
+                  <div class="subsection-title">4.2 สถาบันพระปกเกล้าจะไม่ดำเนินการอื่นใดนอกจากที่ระบุในวัตถุประสงค์</div>
+                  <div class="section-content">
+                    เว้นแต่มีกฎหมายบัญญัติให้กระทำหรือมีหนังสือยินยอมที่สามารถปฏิบัติได้ตามกฎหมาย
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consent Checkbox -->
+          <div class="consent-checkbox-section">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="consentCheck"
+              />
+              <label class="form-check-label consent-label" for="consentCheck">
+                <strong>
+                  ข้าพเจ้ายินยอมให้องค์กรเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้า ตามวัตถุประสงค์ที่ระบุข้างต้น
+                </strong>
+              </label>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="consent-actions">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-lg"
+              onclick="cancelAction()"
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-lg"
+              id="acceptBtn"
+              disabled
+              onclick="proceedToApplication()"
+            >
+              ยอมรับและดำเนินการต่อ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-section">
+        <p><strong>สถาบันพระปกเกล้า</strong></p>
+        <p>© 2025 ระบบรับสมัครงานออนไลน์ | ระบบคุ้มครองข้อมูลส่วนบุคคล</p>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom Script -->
+    <script>
+      // Enable/Disable button based on checkbox
+      document
+        .getElementById("consentCheck")
+        .addEventListener("change", function () {
+          document.getElementById("acceptBtn").disabled = !this.checked;
+        });
+
+      // Cancel action with SweetAlert2
+      function cancelAction() {
+        Swal.fire({
+          title: 'ยกเลิกการดำเนินการ?',
+          text: "คุณต้องการยกเลิกกระบวนการสมัครงานหรือไม่?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#0f5132',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'ใช่, ยกเลิก',
+          cancelButtonText: 'กลับไปแก้ไข',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: 'ยกเลิกแล้ว',
+              text: 'กระบวนการสมัครงานถูกยกเลิก',
+              icon: 'info',
+              confirmButtonColor: '#0f5132',
+              confirmButtonText: 'ตกลง'
+            }).then(() => {
+              window.history.back();
+            });
+          }
+        });
+      }
+
+      // Proceed to application form with SweetAlert2
+      function proceedToApplication() {
+        const consentCheck = document.getElementById('consentCheck');
+        
+        if (!consentCheck.checked) {
+          Swal.fire({
+            title: 'กรุณายืนยันข้อมูล',
+            text: 'กรุณายอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคลก่อนดำเนินการต่อ',
+            icon: 'warning',
+            confirmButtonColor: '#0f5132',
+            confirmButtonText: 'ตกลง'
+          });
+          return;
+        }
+
+        // บันทึกว่ายอมรับ consent แล้ว
+        sessionStorage.setItem("consentAccepted", "true");
+        sessionStorage.setItem("consentDate", new Date().toISOString());
+
+        // แสดง success message
+        Swal.fire({
+          title: 'ยอมรับเงื่อนไขแล้ว',
+          text: 'กำลังไปยังหน้าใบสมัคร...',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          timerProgressBar: true,
+          confirmButtonColor: '#0f5132'
+        }).then(() => {
+          // ไปหน้าใบสมัคร
+          window.location.href = "application.html";
+        });
+      }
+
+      // Load organization logo
+      function loadOrgLogo() {
+        // ถ้ามีการตั้งค่า logo ใน localStorage
+        const logoUrl = localStorage.getItem("orgLogoUrl");
+        if (logoUrl) {
+          document.getElementById("orgLogo").src = logoUrl;
+        }
+      }
+
+      // Check if already accepted (prevent back button)
+      window.addEventListener("load", function () {
+        loadOrgLogo();
+
+        // ถ้ายอมรับแล้ว อาจจะ redirect หรือแสดงข้อความ
+        if (sessionStorage.getItem("consentAccepted") === "true") {
+          // แสดงข้อความ optional
+          // Swal.fire({
+          //   title: 'ท่านได้ยอมรับเงื่อนไขแล้ว',
+          //   text: 'กำลังไปยังหน้าใบสมัคร...',
+          //   icon: 'info',
+          //   timer: 2000,
+          //   showConfirmButton: false,
+          //   confirmButtonColor: '#0f5132'
+          // }).then(() => {
+          //   window.location.href = 'application-v2.html';
+          // });
+        }
+      });
+    </script>
+  </body>
+</html>

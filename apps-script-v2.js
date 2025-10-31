@@ -373,7 +373,7 @@ function processApplication(data) {
     // 6. Send emails
     Logger.log('📧 Sending emails...');
     sendApplicantEmail(data, pdfUrl);
-    sendAdminEmail(data, applicantFolder.getUrl(), pdfUrl);
+//  sendAdminEmail(data, applicantFolder.getUrl(), pdfUrl);
     Logger.log('✓ Sent emails');
     
     Logger.log('='.repeat(50));
@@ -607,7 +607,7 @@ function replacePlaceholders(text, data) {
   // Do not replace it here!
   replace('position', data.position);
   replace('department', data.department);
-  replace('checkbox1', data.checkbox1 ? '☑' : '☐');
+  replace('checkbox1', data.checkbox1 ? '☑' : '');
   replace('salary', data.salary);
   replace('startDate', formatDateThai(data.startDate));
   replace('experienceDetail', data.experienceDetail);
@@ -667,7 +667,7 @@ function replacePlaceholders(text, data) {
   }
   
   // Studying
-  replace('studying', data.studying ? '☑' : '☐');
+  replace('studying', data.studying ? '☑' : '');
   replace('studyfieldofStudy', data.studyfieldofStudy);
   replace('studyfieldType', data.studyfieldType);
   replace('nameofeducationNow', data.nameofeducationNow);
@@ -753,13 +753,13 @@ function replacePlaceholders(text, data) {
     replace('siblingofficeTel' + i, formatPhone(data['siblingofficeTel' + i]));
   }
   
-  replace('noChildren', data.noChildren ? '☑' : '☐');
+  replace('noChildren', data.noChildren ? '☑' : '');
   replace('numberofChildren', data.numberofChildren);
   
   // Page 5: Health
-  replace('physicalimpairmentNo', data.physicalimpairmentNo ? '☑' : '☐');
+  replace('physicalimpairmentNo', data.physicalimpairmentNo ? '☑' : '');
   replace('physicalimpairmentType', data.physicalimpairmentType);
-  replace('illnessoraccidentTypeNo', data.illnessoraccidentTypeNo ? '☑' : '☐');
+  replace('illnessoraccidentTypeNo', data.illnessoraccidentTypeNo ? '☑' : '');
   replace('illnessoraccidentType', data.illnessoraccidentType);
   
   const healthStatuses = ['Excellent', 'Good', 'Poor', 'Bad'];
@@ -767,11 +767,11 @@ function replacePlaceholders(text, data) {
     replace('health\\[' + status + '\\]', data.health === status ? '☑' : '');
   });
   
-  replace('bankruptorcommittedaCriminalNo', data.bankruptorcommittedaCriminalNo ? '☑' : '☐');
+  replace('bankruptorcommittedaCriminalNo', data.bankruptorcommittedaCriminalNo ? '☑' : '');
   replace('bankruptorcommittedaCriminaldetail', data.bankruptorcommittedaCriminaldetail);
-  replace('firedfromaJobNo', data.firedfromaJobNo ? '☑' : '☐');
+  replace('firedfromaJobNo', data.firedfromaJobNo ? '☑' : '');
   replace('firedfromaJobreason', data.firedfromaJobreason);
-  replace('acquaintanceattheKPINo', data.acquaintanceattheKPINo ? '☑' : '☐');
+  replace('acquaintanceattheKPINo', data.acquaintanceattheKPINo ? '☑' : '');
   replace('acquaintanceattheKPIname', data.acquaintanceattheKPIname);
   replace('additionalInformation', data.additionalInformation);
   
@@ -905,12 +905,13 @@ function saveToSheet(data, folderUrl, pdfUrl) {
     
     if (sheet.getLastRow() === 0) {
       const headers = [
-        'วันที่สมัคร', 'เวลา', 'ตำแหน่ง', 'หน่วยงาน', 'เงินเดือนที่ต้องการ',
-        'ชื่อ-นามสกุล (TH)', 'ชื่อ-นามสกุล (EN)', 
-        'เลขบัตรประชาชน', 'วันเกิด', 'อายุ', 'เพศ', 'สัญชาติ', 'ศาสนา',
-        'โทรศัพท์', 'อีเมล', 'ที่อยู่',
-        'การศึกษาสูงสุด', 'สาขา', 'สถาบัน',
-        'สถานภาพทหาร', 'สถานภาพการสมรส',
+        'วันที่สมัคร', 'เวลา', 'ตำแหน่ง', 'หน่วยงาน',
+        'ชื่อ – สกุล', 'วันเกิด', 'อายุ',
+        'วุฒิการศึกษา', 'สาขาวิชา', 'ปีที่จบ', 'เกรดเฉลี่ย', 'สถานศึกษา',
+        'สถานภาพ',
+        'ประสบการณ์ 1 - ตำแหน่ง/ลักษณะงาน', 'ประสบการณ์ 1 - หน่วยงาน', 'ประสบการณ์ 1 - ระยะเวลา',
+        'ประสบการณ์ 2 - ตำแหน่ง/ลักษณะงาน', 'ประสบการณ์ 2 - หน่วยงาน', 'ประสบการณ์ 2 - ระยะเวลา',
+        'อัตราเงินเดือนที่ต้องการ',
         'ลิงก์โฟลเดอร์', 'ลิงก์ PDF'
       ];
       sheet.appendRow(headers);
@@ -921,28 +922,47 @@ function saveToSheet(data, folderUrl, pdfUrl) {
       headerRange.setFontColor('#ffffff');
     }
     
+    // ฟังก์ชันสำหรับสร้างช่วงระยะเวลา
+    const formatPeriod = (start, end) => {
+      if (!start && !end) return '-';
+      const startDate = start ? formatDateThai(start) : '';
+      const endDate = end ? formatDateThai(end) : 'ปัจจุบัน';
+      return startDate && endDate ? `${startDate} - ${endDate}` : '-';
+    };
+    
+    // ฟังก์ชันรวมตำแหน่งและลักษณะงาน
+    const formatJobInfo = (position, description) => {
+      const pos = position || '';
+      const desc = description || '';
+      if (pos && desc) return `${pos} / ${desc}`;
+      if (pos) return pos;
+      if (desc) return desc;
+      return '-';
+    };
+    
     const row = [
       formatDateThai(new Date()),
       Utilities.formatDate(new Date(), 'GMT+7', 'HH:mm:ss'),
       data.position,
-      data.department,
-      data.salary,
+      data.department || '-',
       data.fullnameTH,
-      data.fullnameEN,
-      data.national_id,
       formatDateThai(data.dateOfbirth),
       data.age,
-      data.gender || '-',
-      data.nationality,
-      data.religion,
-      data.tel,
-      data.email,
-      data.addressNow,
       data.educationLevel1 || '-',
       data.fieldofStudy1 || '-',
+      data.eduUntiltheyear1 || '-',
+      data.gpa1 || '-',
       data.nameofEducation1 || '-',
-      data.militaryStatus,
-      data.maritalStatus,
+      data.maritalStatus || '-',
+      // ประสบการณ์ 1
+      formatJobInfo(data.comp1positionEnd, data.jobDescription1),
+      data.companyName1 || '-',
+      formatPeriod(data.comp1Start, data.comp1End),
+      // ประสบการณ์ 2
+      formatJobInfo(data.comp2positionEnd, data.jobDescription2),
+      data.companyName2 || '-',
+      formatPeriod(data.comp2Start, data.comp2End),
+      data.salary,
       folderUrl,
       pdfUrl
     ];

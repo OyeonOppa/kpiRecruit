@@ -5,12 +5,14 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn9U8atjm7reFA
 let currentStep = 1;
 const totalSteps = 5;
 let photoData = null;
-let educationCount = 0;
-let experienceCount = 0;
-let trainingCount = 0;
-let languageCount = 0;
-let siblingCount = 0;
-let referenceCount = 0;
+
+// ⭐ ใช้ Set เก็บ active IDs แทน counter (เริ่มจากว่าง)
+let activeEducationIds = new Set(); // ✅ เริ่มจากว่าง
+let activeExperienceIds = new Set();
+let activeTrainingIds = new Set();
+let activeLanguageIds = new Set();
+let activeSiblingIds = new Set();
+let activeReferenceIds = new Set();
 
 // Document files
 let documentsData = {
@@ -139,7 +141,6 @@ function handlePhotoUpload(event) {
         document.getElementById('previewImage').src = photoData;
         document.getElementById('photoPreview').classList.remove('hidden');
         
-        // แสดง Toast notification
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -198,7 +199,6 @@ function handleDocumentUpload(event, docType) {
         };
         console.log(`✓ Loaded ${docType}: ${file.name}`);
         
-        // แสดง Toast notification
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -282,9 +282,18 @@ function toggleField(fieldId, show) {
 
 // ==================== Dynamic Form Sections ====================
 
+// ⭐ หาเลข ID ว่างที่เล็กที่สุด
+function getNextAvailableId(activeSet) {
+    let id = 1;
+    while (activeSet.has(id)) {
+        id++;
+    }
+    return id;
+}
+
 // Education
 function addEducation() {
-    if (educationCount >= 4) {
+    if (activeEducationIds.size >= 4) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มประวัติการศึกษาได้สูงสุด 4 รายการ',
@@ -294,24 +303,25 @@ function addEducation() {
         });
         return;
     }
-    educationCount++;
     
-    // ⭐ entry แรกต้อง required
-    const isFirstEntry = educationCount === 1;
+    const newId = getNextAvailableId(activeEducationIds);
+    activeEducationIds.add(newId);
+    
+    const isFirstEntry = newId === 1;
     const requiredAttr = isFirstEntry ? 'required' : '';
     const requiredClass = isFirstEntry ? 'required' : '';
     
     const container = document.getElementById('educationContainer');
     const html = `
-        <div class="education-entry border rounded p-3 mb-3" id="education${educationCount}">
+        <div class="education-entry border rounded p-3 mb-3" id="education${newId}">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6>ประวัติการศึกษา ${educationCount} ${isFirstEntry ? '<span style="color: #dc2626;">*</span>' : ''}</h6>
-                ${!isFirstEntry ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEducation(${educationCount})">ลบ</button>` : ''}
+                <h6>ประวัติการศึกษา ${newId} ${isFirstEntry ? '<span style="color: #dc2626;">*</span>' : ''}</h6>
+                ${!isFirstEntry ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEducation(${newId})">ลบ</button>` : ''}
             </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label ${requiredClass}">ระดับการศึกษา</label>
-                    <select class="form-select" id="educationLevel${educationCount}" name="educationLevel${educationCount}" ${requiredAttr}>
+                    <select class="form-select" id="educationLevel${newId}" name="educationLevel${newId}" ${requiredAttr}>
                         <option value="">เลือก</option>
                         <option value="ปริญญาตรี">ปริญญาตรี</option>
                         <option value="ปริญญาโท">ปริญญาโท</option>
@@ -320,31 +330,31 @@ function addEducation() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label ${requiredClass}">ตั้งแต่ปี (พ.ศ.)</label>
-                    <input type="number" class="form-control no-spin" id="eduSincetheyear${educationCount}" name="eduSincetheyear${educationCount}" ${requiredAttr}>
+                    <input type="number" class="form-control no-spin" id="eduSincetheyear${newId}" name="eduSincetheyear${newId}" ${requiredAttr}>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label ${requiredClass}">จนถึงปี (พ.ศ.)</label>
-                    <input type="number" class="form-control no-spin" id="eduUntiltheyear${educationCount}" name="eduUntiltheyear${educationCount}" ${requiredAttr}>
+                    <input type="number" class="form-control no-spin" id="eduUntiltheyear${newId}" name="eduUntiltheyear${newId}" ${requiredAttr}>
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-12">
                     <label class="form-label ${requiredClass}">ชื่อสถานศึกษา</label>
-                    <input type="text" class="form-control" id="nameofEducation${educationCount}" name="nameofEducation${educationCount}" ${requiredAttr}>
+                    <input type="text" class="form-control" id="nameofEducation${newId}" name="nameofEducation${newId}" ${requiredAttr}>
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-4">
                     <label class="form-label ${requiredClass}">วุฒิการศึกษา</label>
-                    <input type="text" class="form-control" id="qualifications${educationCount}" name="qualifications${educationCount}" ${requiredAttr}>
+                    <input type="text" class="form-control" id="qualifications${newId}" name="qualifications${newId}" ${requiredAttr}>
                 </div>
                 <div class="col-md-5">
                     <label class="form-label ${requiredClass}">สาขาวิชา</label>
-                    <input type="text" class="form-control" id="fieldofStudy${educationCount}" name="fieldofStudy${educationCount}" ${requiredAttr}>
+                    <input type="text" class="form-control" id="fieldofStudy${newId}" name="fieldofStudy${newId}" ${requiredAttr}>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">GPA</label>
-                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${educationCount}" name="gpa${educationCount}">
+                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}">
                 </div>
             </div>
         </div>
@@ -352,9 +362,8 @@ function addEducation() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
-function removeEducation(index) {
-    // ไม่ให้ลบ entry แรก
-    if (index === 1) {
+function removeEducation(id) {
+    if (id === 1) {
         Swal.fire({
             title: 'ไม่สามารถลบได้',
             text: 'กรุณากรอกประวัติการศึกษาอย่างน้อย 1 รายการ',
@@ -376,9 +385,10 @@ function removeEducation(index) {
         cancelButtonText: 'ยกเลิก'
     }).then((result) => {
         if (result.isConfirmed) {
-            const element = document.getElementById(`education${index}`);
+            const element = document.getElementById(`education${id}`);
             if (element) {
                 element.remove();
+                activeEducationIds.delete(id);
             }
         }
     });
@@ -386,7 +396,7 @@ function removeEducation(index) {
 
 // Experience
 function addExperience() {
-    if (experienceCount >= 3) {
+    if (activeExperienceIds.size >= 3) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มประสบการณ์ทำงานได้สูงสุด 3 รายการ',
@@ -396,82 +406,108 @@ function addExperience() {
         });
         return;
     }
-    experienceCount++;
+    
+    const newId = getNextAvailableId(activeExperienceIds);
+    activeExperienceIds.add(newId);
     
     const container = document.getElementById('experienceContainer');
     const html = `
-        <div class="experience-entry border rounded p-3 mb-3" id="experience${experienceCount}">
-            <h6>ประสบการณ์ทำงาน ${experienceCount}</h6>
+        <div class="experience-entry border rounded p-3 mb-3" id="experience${newId}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>ประสบการณ์ทำงาน ${newId}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExperience(${newId})">ลบ</button>
+            </div>
             <div class="row mb-2">
                 <div class="col-md-8">
                     <label class="form-label">ชื่อบริษัท</label>
-                    <input type="text" class="form-control" id="companyName${experienceCount}" name="companyName${experienceCount}">
+                    <input type="text" class="form-control" id="companyName${newId}" name="companyName${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">ประเภทธุรกิจ</label>
-                    <input type="text" class="form-control" id="businessType${experienceCount}" name="businessType${experienceCount}">
+                    <input type="text" class="form-control" id="businessType${newId}" name="businessType${newId}">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-8">
                     <label class="form-label">ที่อยู่บริษัท</label>
-                    <input type="text" class="form-control" id="companyAddress${experienceCount}" name="companyAddress${experienceCount}">
+                    <input type="text" class="form-control" id="companyAddress${newId}" name="companyAddress${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">โทรศัพท์</label>
-                    <input type="tel" class="form-control" id="companyTel${experienceCount}" name="companyTel${experienceCount}">
+                    <input type="tel" class="form-control" id="companyTel${newId}" name="companyTel${newId}">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="form-label">ลักษณะงานที่รับผิดชอบ</label>
-                <textarea class="form-control" id="jobDescription${experienceCount}" name="jobDescription${experienceCount}" rows="2"></textarea>
+                <textarea class="form-control" id="jobDescription${newId}" name="jobDescription${newId}" rows="2"></textarea>
             </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">วันที่เริ่มงาน</label>
-                    <input type="date" class="form-control" id="comp${experienceCount}Start" name="comp${experienceCount}Start">
+                    <input type="date" class="form-control" id="comp${newId}Start" name="comp${newId}Start">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">วันที่สิ้นสุด</label>
-                    <input type="date" class="form-control" id="comp${experienceCount}End" name="comp${experienceCount}End">
+                    <input type="date" class="form-control" id="comp${newId}End" name="comp${newId}End">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">ตำแหน่งแรกเข้า</label>
-                    <input type="text" class="form-control" id="comp${experienceCount}positionStart" name="comp${experienceCount}positionStart">
+                    <input type="text" class="form-control" id="comp${newId}positionStart" name="comp${newId}positionStart">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">ตำแหน่งสุดท้าย</label>
-                    <input type="text" class="form-control" id="comp${experienceCount}positionEnd" name="comp${experienceCount}positionEnd">
+                    <input type="text" class="form-control" id="comp${newId}positionEnd" name="comp${newId}positionEnd">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-4">
                     <label class="form-label">เงินเดือนแรกเข้า</label>
-                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryStart" name="comp${experienceCount}salaryStart">
+                    <input type="number" class="form-control no-spin" id="comp${newId}salaryStart" name="comp${newId}salaryStart">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">เงินเดือนสุดท้าย</label>
-                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryEnd" name="comp${experienceCount}salaryEnd">
+                    <input type="number" class="form-control no-spin" id="comp${newId}salaryEnd" name="comp${newId}salaryEnd">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">รายได้อื่นๆ</label>
-                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryEtc" name="comp${experienceCount}salaryEtc">
+                    <input type="number" class="form-control no-spin" id="comp${newId}salaryEtc" name="comp${newId}salaryEtc">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="form-label">เหตุผลที่ออกจากงาน</label>
-                <textarea class="form-control" id="comp${experienceCount}Reasonsforleaving" name="comp${experienceCount}Reasonsforleaving" rows="2"></textarea>
+                <textarea class="form-control" id="comp${newId}Reasonsforleaving" name="comp${newId}Reasonsforleaving" rows="2"></textarea>
             </div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
 }
 
+function removeExperience(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบประสบการณ์ทำงานรายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`experience${id}`);
+            if (element) {
+                element.remove();
+                activeExperienceIds.delete(id);
+            }
+        }
+    });
+}
+
 // Training
 function addTraining() {
-    if (trainingCount >= 5) {
+    if (activeTrainingIds.size >= 5) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มการฝึกอบรมได้สูงสุด 5 รายการ',
@@ -481,30 +517,35 @@ function addTraining() {
         });
         return;
     }
-    trainingCount++;
+    
+    const newId = getNextAvailableId(activeTrainingIds);
+    activeTrainingIds.add(newId);
     
     const container = document.getElementById('trainingContainer');
     const html = `
-        <div class="training-entry border rounded p-3 mb-3" id="training${trainingCount}">
-            <h6>การฝึกอบรม ${trainingCount}</h6>
+        <div class="training-entry border rounded p-3 mb-3" id="training${newId}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>การฝึกอบรม ${newId}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTraining(${newId})">ลบ</button>
+            </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">หลักสูตร</label>
-                    <input type="text" class="form-control" id="course${trainingCount}" name="course${trainingCount}">
+                    <input type="text" class="form-control" id="course${newId}" name="course${newId}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">สถานที่ฝึกอบรม</label>
-                    <input type="text" class="form-control" id="coursePlace${trainingCount}" name="coursePlace${trainingCount}">
+                    <input type="text" class="form-control" id="coursePlace${newId}" name="coursePlace${newId}">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">ประกาศนียบัตร</label>
-                    <input type="text" class="form-control" id="diploma${trainingCount}" name="diploma${trainingCount}">
+                    <input type="text" class="form-control" id="diploma${newId}" name="diploma${newId}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">ระยะเวลา</label>
-                    <input type="text" class="form-control" id="coursesTime${trainingCount}" name="coursesTime${trainingCount}">
+                    <input type="text" class="form-control" id="coursesTime${newId}" name="coursesTime${newId}">
                 </div>
             </div>
         </div>
@@ -512,9 +553,30 @@ function addTraining() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
+function removeTraining(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบการฝึกอบรมรายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`training${id}`);
+            if (element) {
+                element.remove();
+                activeTrainingIds.delete(id);
+            }
+        }
+    });
+}
+
 // Language
 function addLanguage() {
-    if (languageCount >= 3) {
+    if (activeLanguageIds.size >= 3) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มทักษะภาษาได้สูงสุด 3 ภาษา',
@@ -524,22 +586,27 @@ function addLanguage() {
         });
         return;
     }
-    languageCount++;
+    
+    const newId = getNextAvailableId(activeLanguageIds);
+    activeLanguageIds.add(newId);
     
     const container = document.getElementById('languageContainer');
     const html = `
-        <div class="language-entry border rounded p-3 mb-3" id="language${languageCount}">
-            <h6>ภาษา ${languageCount}</h6>
+        <div class="language-entry border rounded p-3 mb-3" id="language${newId}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>ภาษา ${newId}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLanguage(${newId})">ลบ</button>
+            </div>
             <div class="row mb-2">
                 <div class="col-md-12">
                     <label class="form-label">ภาษา</label>
-                    <input type="text" class="form-control" id="languegeSkill${languageCount}" name="languegeSkill${languageCount}">
+                    <input type="text" class="form-control" id="languegeSkill${newId}" name="languegeSkill${newId}">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-3">
                     <label class="form-label">พูด</label>
-                    <select class="form-select" id="speak${languageCount}" name="speak${languageCount}">
+                    <select class="form-select" id="speak${newId}" name="speak${newId}">
                         <option value="">เลือก</option>
                         <option value="พอใช้">พอใช้</option>
                         <option value="ดี">ดี</option>
@@ -549,7 +616,7 @@ function addLanguage() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">อ่าน</label>
-                    <select class="form-select" id="read${languageCount}" name="read${languageCount}">
+                    <select class="form-select" id="read${newId}" name="read${newId}">
                         <option value="">เลือก</option>
                         <option value="พอใช้">พอใช้</option>
                         <option value="ดี">ดี</option>
@@ -559,7 +626,7 @@ function addLanguage() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">เขียน</label>
-                    <select class="form-select" id="write${languageCount}" name="write${languageCount}">
+                    <select class="form-select" id="write${newId}" name="write${newId}">
                         <option value="">เลือก</option>
                         <option value="พอใช้">พอใช้</option>
                         <option value="ดี">ดี</option>
@@ -569,7 +636,7 @@ function addLanguage() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">ฟัง</label>
-                    <select class="form-select" id="listen${languageCount}" name="listen${languageCount}">
+                    <select class="form-select" id="listen${newId}" name="listen${newId}">
                         <option value="">เลือก</option>
                         <option value="พอใช้">พอใช้</option>
                         <option value="ดี">ดี</option>
@@ -583,9 +650,30 @@ function addLanguage() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
+function removeLanguage(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบทักษะภาษารายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`language${id}`);
+            if (element) {
+                element.remove();
+                activeLanguageIds.delete(id);
+            }
+        }
+    });
+}
+
 // Sibling
 function addSibling() {
-    if (siblingCount >= 5) {
+    if (activeSiblingIds.size >= 5) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มข้อมูลพี่น้องได้สูงสุด 5 คน',
@@ -595,34 +683,39 @@ function addSibling() {
         });
         return;
     }
-    siblingCount++;
+    
+    const newId = getNextAvailableId(activeSiblingIds);
+    activeSiblingIds.add(newId);
     
     const container = document.getElementById('siblingsContainer');
     const html = `
-        <div class="sibling-entry border rounded p-3 mb-3" id="sibling${siblingCount}">
-            <h6>พี่/น้อง ${siblingCount}</h6>
+        <div class="sibling-entry border rounded p-3 mb-3" id="sibling${newId}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>พี่/น้อง ${newId}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSibling(${newId})">ลบ</button>
+            </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">ชื่อ-นามสกุล</label>
-                    <input type="text" class="form-control" id="siblingFullname${siblingCount}" name="siblingFullname${siblingCount}">
+                    <input type="text" class="form-control" id="siblingFullname${newId}" name="siblingFullname${newId}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">อายุ</label>
-                    <input type="number" class="form-control" id="siblingAge${siblingCount}" name="siblingAge${siblingCount}">
+                    <input type="number" class="form-control" id="siblingAge${newId}" name="siblingAge${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">อาชีพ</label>
-                    <input type="text" class="form-control" id="siblingJob${siblingCount}" name="siblingJob${siblingCount}">
+                    <input type="text" class="form-control" id="siblingJob${newId}" name="siblingJob${newId}">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-8">
                     <label class="form-label">ที่อยู่</label>
-                    <input type="text" class="form-control" id="siblingofficeAddress${siblingCount}" name="siblingofficeAddress${siblingCount}">
+                    <input type="text" class="form-control" id="siblingofficeAddress${newId}" name="siblingofficeAddress${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">เบอร์โทร</label>
-                    <input type="tel" class="form-control" id="siblingofficeTel${siblingCount}" name="siblingofficeTel${siblingCount}">
+                    <input type="tel" class="form-control" id="siblingofficeTel${newId}" name="siblingofficeTel${newId}">
                 </div>
             </div>
         </div>
@@ -630,9 +723,30 @@ function addSibling() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
+function removeSibling(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบข้อมูลพี่น้องรายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`sibling${id}`);
+            if (element) {
+                element.remove();
+                activeSiblingIds.delete(id);
+            }
+        }
+    });
+}
+
 // Reference
 function addReference() {
-    if (referenceCount >= 3) {
+    if (activeReferenceIds.size >= 3) {
         Swal.fire({
             title: 'ถึงจำนวนสูงสุดแล้ว',
             text: 'สามารถเพิ่มบุคคลอ้างอิงได้สูงสุด 3 คน',
@@ -642,30 +756,35 @@ function addReference() {
         });
         return;
     }
-    referenceCount++;
+    
+    const newId = getNextAvailableId(activeReferenceIds);
+    activeReferenceIds.add(newId);
     
     const container = document.getElementById('referenceContainer');
     const html = `
-        <div class="reference-entry border rounded p-3 mb-3" id="reference${referenceCount}">
-            <h6>บุคคลอ้างอิง ${referenceCount}</h6>
+        <div class="reference-entry border rounded p-3 mb-3" id="reference${newId}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>บุคคลอ้างอิง ${newId}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeReference(${newId})">ลบ</button>
+            </div>
             <div class="row mb-2">
                 <div class="col-md-6">
                     <label class="form-label">ชื่อ-นามสกุล</label>
-                    <input type="text" class="form-control" id="referencepersonName${referenceCount}" name="referencepersonName${referenceCount}">
+                    <input type="text" class="form-control" id="referencepersonName${newId}" name="referencepersonName${newId}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">ตำแหน่ง</label>
-                    <input type="text" class="form-control" id="referencepersonJob${referenceCount}" name="referencepersonJob${referenceCount}">
+                    <input type="text" class="form-control" id="referencepersonJob${newId}" name="referencepersonJob${newId}">
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-8">
                     <label class="form-label">สถานที่ทำงาน ที่อยู่</label>
-                    <input type="text" class="form-control" id="referencepersonofficeAddress${referenceCount}" name="referencepersonofficeAddress${referenceCount}">
+                    <input type="text" class="form-control" id="referencepersonofficeAddress${newId}" name="referencepersonofficeAddress${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">โทรศัพท์</label>
-                    <input type="tel" class="form-control" id="referencepersonTel${referenceCount}" name="referencepersonTel${referenceCount}">
+                    <input type="tel" class="form-control" id="referencepersonTel${newId}" name="referencepersonTel${newId}">
                 </div>
             </div>
         </div>
@@ -673,10 +792,30 @@ function addReference() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
-// ==================== Step Navigation ====================
+function removeReference(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบบุคคลอ้างอิงรายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`reference${id}`);
+            if (element) {
+                element.remove();
+                activeReferenceIds.delete(id);
+            }
+        }
+    });
+}
+
 // ==================== Step Navigation ====================
 function changeStep(direction) {
-    // ⭐ เช็ค checkbox1 ใน step 1 ก่อน
+    // เช็ค checkbox1 ใน step 1 ก่อน
     if (direction === 1 && currentStep === 1) {
         const cb = document.getElementById('checkbox1');
         if (cb && cb.required && !cb.checked) {
@@ -691,12 +830,12 @@ function changeStep(direction) {
         }
     }
 
-    // ⭐ Validate step ก่อนไปต่อ
+    // Validate step ก่อนไปต่อ
     if (direction === 1 && !validateStep(currentStep)) {
         return;
     }
 
-    // ⭐ เปลี่ยน step
+    // เปลี่ยน step
     const newStep = currentStep + direction;
     if (newStep < 1 || newStep > totalSteps) return;
 
@@ -732,7 +871,7 @@ function validateStep(step) {
     const requiredFields = stepElement.querySelectorAll('[required]');
     
     for (let field of requiredFields) {
-        if (field.offsetParent === null) continue; // Skip hidden fields
+        if (field.offsetParent === null) continue;
         
         if (!field.value.trim()) {
             Swal.fire({
@@ -747,7 +886,6 @@ function validateStep(step) {
         }
     }
 
-    // ตรวจสอบรูปถ่ายในขั้นตอนที่ 1
     if (step === 1 && !photoData) {
         Swal.fire({
             title: 'ยังไม่มีรูปถ่าย',
@@ -759,10 +897,9 @@ function validateStep(step) {
         document.getElementById('photo').focus();
         return false;
     }
-    // ⭐ เพิ่มส่วนนี้: เช็คประวัติการศึกษา (step 3)
+
     if (step === 3) {
-        // เช็คว่ามี education entry อย่างน้อย 1 อัน
-        if (educationCount < 1) {
+        if (activeEducationIds.size < 1) {
             Swal.fire({
                 title: 'กรุณากรอกประวัติการศึกษา',
                 text: 'กรุณาเพิ่มประวัติการศึกษาอย่างน้อย 1 รายการ',
@@ -773,7 +910,6 @@ function validateStep(step) {
             return false;
         }
         
-        // เช็คว่า entry แรกมีข้อมูลครบ
         const edu1Level = document.getElementById('educationLevel1');
         const edu1Name = document.getElementById('nameofEducation1');
         const edu1Qual = document.getElementById('qualifications1');
@@ -812,7 +948,6 @@ async function handleSubmit(event) {
         return;
     }
 
-    // แสดง confirmation dialog ก่อนส่ง
     const result = await Swal.fire({
         title: 'ยืนยันการส่งใบสมัคร?',
         html: 'กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนส่ง<br><br><strong>คุณต้องการส่งใบสมัครหรือไม่?</strong>',
@@ -829,7 +964,6 @@ async function handleSubmit(event) {
         return;
     }
 
-    // แสดง Loading
     Swal.fire({
         title: 'กำลังส่งใบสมัคร...',
         html: 'กรุณารอสักครู่<br>ระบบกำลังประมวลผลข้อมูลของท่าน',
@@ -852,7 +986,6 @@ async function handleSubmit(event) {
         const response = await sendToAppsScript(formData);
         console.log('✅ Server response:', response);
 
-        // ปิด loading และแสดง success
         Swal.fire({
             title: 'ส่งใบสมัครสำเร็จ!',
             html: 'ส่งใบสมัครเรียบร้อยแล้ว<br><br>กรุณาตรวจสอบอีเมลเพื่อรับเอกสารยืนยันการสมัคร',
@@ -885,7 +1018,6 @@ function collectFormData() {
         consentDate: sessionStorage.getItem('consentDate') || new Date().toISOString(),
         photo: photoData,
         
-        // Basic info
         position: getValue('position'),
         department: getValue('department'),
         checkbox1: getChecked('checkbox1'),
@@ -893,7 +1025,6 @@ function collectFormData() {
         startDate: getValue('startDate'),
         experienceDetail: getValue('experienceDetail'),
         
-        // Personal info
         fullnameTH: getValue('fullnameTH'),
         fullnameEN: getValue('fullnameEN'),
         dateOfbirth: getValue('dateOfbirth'),
@@ -910,27 +1041,24 @@ function collectFormData() {
         militaryStatus: getValue('militaryStatus'),
         maritalStatus: getValue('maritalStatus'),
         
-        // Address
         addressNow: getValue('addressNow'),
         tel: getValue('tel'),
         email: getValue('email'),
         addressType: getValue('addressType'),
         addressHometown: getValue('addressHometown') || getValue('addressNow'),
         
-        // Contact person
         contactpersonName: getValue('contactpersonName'),
         contactpersonRelationship: getValue('contactpersonRelationship'),
         contactpersonAddress: getValue('contactpersonAddress') || getValue('addressNow'),
         contactpersonTel: getValue('contactpersonTel'),
         contactpersonEmail: getValue('contactpersonEmail'),
         
-        // Education (dynamic)
-        ...collectDynamicData('education', educationCount, [
+        // ⭐ เก็บข้อมูลจาก active IDs จริง
+        ...collectDynamicDataFromSet('education', activeEducationIds, [
             'educationLevel', 'eduSincetheyear', 'eduUntiltheyear',
             'nameofEducation', 'qualifications', 'fieldofStudy', 'gpa'
         ]),
         
-        // Studying
         studying: getChecked('studying'),
         studyfieldofStudy: getValue('studyfieldofStudy'),
         studyfieldType: getValue('studyfieldType'),
@@ -938,8 +1066,7 @@ function collectFormData() {
         studyingSection: getValue('studyingSection'),
         expectedgraduationYear: getValue('expectedgraduationYear'),
         
-        // Experience (dynamic)
-        ...collectDynamicData('experience', experienceCount, [
+        ...collectDynamicDataFromSet('experience', activeExperienceIds, [
             'companyName', 'businessType', 'companyAddress', 'companyTel',
             'jobDescription', 'comp{i}Start', 'comp{i}End',
             'comp{i}positionStart', 'comp{i}positionEnd',
@@ -947,17 +1074,14 @@ function collectFormData() {
             'comp{i}Reasonsforleaving'
         ]),
         
-        // Training (dynamic)
-        ...collectDynamicData('training', trainingCount, [
+        ...collectDynamicDataFromSet('training', activeTrainingIds, [
             'course', 'coursePlace', 'diploma', 'coursesTime'
         ]),
         
-        // Skills
         academicWorks: getValue('academicWorks'),
         computerSkill: getValue('computerSkill'),
         
-        // Language (dynamic)
-        ...collectDynamicData('language', languageCount, [
+        ...collectDynamicDataFromSet('language', activeLanguageIds, [
             'languegeSkill', 'speak', 'read', 'write', 'listen'
         ]),
         
@@ -967,7 +1091,6 @@ function collectFormData() {
         sport2: getValue('sport2'),
         sport3: getValue('sport3'),
         
-        // Family
         fatherFullname: getValue('fatherFullname'),
         fatherAge: getValue('fatherAge'),
         fatherJob: getValue('fatherJob'),
@@ -979,7 +1102,6 @@ function collectFormData() {
         motherofficeAddress: getValue('motherofficeAddress'),
         motherofficeTel: getValue('motherofficeTel'),
         
-        // Husband/Wife
         husbandwifeFullname: getValue('husbandwifeFullname'),
         husbandwifeAge: getValue('husbandwifeAge'),
         husbandwifeJob: getValue('husbandwifeJob'),
@@ -988,8 +1110,7 @@ function collectFormData() {
         
         numberofSiblings: getValue('numberofSiblings'),
         
-        // Siblings (dynamic)
-        ...collectDynamicData('sibling', siblingCount, [
+        ...collectDynamicDataFromSet('sibling', activeSiblingIds, [
             'siblingFullname', 'siblingAge', 'siblingJob',
             'siblingofficeAddress', 'siblingofficeTel'
         ]),
@@ -997,14 +1118,12 @@ function collectFormData() {
         noChildren: getChecked('noChildren'),
         numberofChildren: getValue('numberofChildren'),
         
-        // Health
         physicalimpairmentNo: getChecked('physicalimpairmentNo'),
         physicalimpairmentType: getValue('physicalimpairmentType'),
         illnessoraccidentTypeNo: getChecked('illnessoraccidentTypeNo'),
         illnessoraccidentType: getValue('illnessoraccidentType'),
         health: getValue('health'),
         
-        // Other info
         bankruptorcommittedaCriminalNo: getChecked('bankruptorcommittedaCriminalNo'),
         bankruptorcommittedaCriminaldetail: getValue('bankruptorcommittedaCriminaldetail'),
         firedfromaJobNo: getChecked('firedfromaJobNo'),
@@ -1013,31 +1132,17 @@ function collectFormData() {
         acquaintanceattheKPIname: getValue('acquaintanceattheKPIname'),
         additionalInformation: getValue('additionalInformation'),
         
-        // References (dynamic)
-        ...collectDynamicData('reference', referenceCount, [
+        ...collectDynamicDataFromSet('reference', activeReferenceIds, [
             'referencepersonName', 'referencepersonJob',
             'referencepersonofficeAddress', 'referencepersonTel'
         ]),
         
-        // Documents
         documents: documentsData,
         
         timestamp: new Date().toISOString()
     };
     
-    // Log summary
-    console.log('✅ Form data collected:');
-    console.log('  - Photo:', data.photo ? `Yes (${data.photo.length} chars)` : 'No');
-    console.log('  - Documents:', data.documents);
-    
-    if (data.documents) {
-        console.log('  - Document details:');
-        for (const [key, value] of Object.entries(data.documents)) {
-            if (value && value.data) {
-                console.log(`    * ${key}: ${value.name} (${value.data.length} chars)`);
-            }
-        }
-    }
+    console.log('✅ Form data collected');
     
     return data;
 }
@@ -1052,16 +1157,17 @@ function getChecked(id) {
     return element ? element.checked : false;
 }
 
-function collectDynamicData(prefix, count, fields) {
+// ⭐ เก็บข้อมูลจาก Set แทน counter
+function collectDynamicDataFromSet(prefix, activeSet, fields) {
     const data = {};
     
-    for (let i = 1; i <= count; i++) {
+    activeSet.forEach(id => {
         fields.forEach(field => {
-            let fieldName = field.replace('{i}', i);
-            const fullFieldName = fieldName.includes(prefix) ? fieldName : `${fieldName}${i}`;
+            let fieldName = field.replace('{i}', id);
+            const fullFieldName = fieldName.includes(prefix) ? fieldName : `${fieldName}${id}`;
             data[fullFieldName] = getValue(fullFieldName);
         });
-    }
+    });
     
     return data;
 }
@@ -1077,18 +1183,4 @@ async function sendToAppsScript(formData) {
     });
 
     return { success: true };
-}
-
-function showLoading() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('hidden');
-    }
-}
-
-function hideLoading() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.add('hidden');
-    }
 }

@@ -3,11 +3,12 @@
 // ===============================
 
 const CONFIG = {
-  MAIN_FOLDER_ID: 'YOUR_MAIN_FOLDER_ID',           // โฟลเดอร์หลัก
-  TEMPLATE_SLIDE_ID: 'YOUR_TEMPLATE_SLIDE_ID',     // Google Slides Template
-  ADMIN_EMAIL: 'hr@example.com',                    // อีเมล HR
+  MAIN_FOLDER_ID: '1MJ5AS9RDkMPMJFTO9n1NmTU1alzEhcIe',           // โฟลเดอร์หลัก
+  TEMPLATE_SLIDE_ID: '10FOJD-7Ru6HHHrWgRXKTfSf8tOMCouy3uqUbepvAtkk',     // Google Slides Template
+  ADMIN_EMAIL: 'worasit.ko@kpi.ac.th',                    // อีเมล HR
   ORG_NAME: 'สถาบันพระปกเกล้า',
-  ORG_ADDRESS: 'ที่อยู่สถาบัน'
+  ORG_ADDRESS: 'ศูนย์ราชการเฉลิมพระเกียรติ 80 พรรษา อาคารรัฐประศาสนภักดี ชั้น 5 ฝั่งทิศใต้ เลขที่ 120 หมู่ 3 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพ 10210',
+  LOGO_URL: 'https://kpi.ac.th/wp-content/uploads/2025/03/KPI-LOGO-PNG-01.png'
 };
 
 // ===============================
@@ -38,13 +39,309 @@ function doPost(e) {
 }
 
 // ===============================
+// Email Templates - Fixed Version
+// ===============================
+
+function createEmailTemplate(content) {
+  return `
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f6f8;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* รองรับ Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a;
+      }
+      .email-container {
+        background-color: #2d2d2d !important;
+        border: 1px solid #404040;
+      }
+      .content {
+        color: #e0e0e0 !important;
+      }
+      .greeting, .section-title {
+        color: #4ade80 !important;
+      }
+      .message {
+        color: #d1d5db !important;
+      }
+      .info-box {
+        background: #1f2937 !important;
+        border-left-color: #4ade80 !important;
+      }
+      .info-box h3 {
+        color: #4ade80 !important;
+      }
+      .info-label {
+        color: #d1d5db !important;
+      }
+      .info-value {
+        color: #9ca3af !important;
+      }
+      .highlight {
+        background: #374151 !important;
+        border-left-color: #fbbf24 !important;
+        color: #e0e0e0 !important;
+      }
+      .footer {
+        background-color: #1f2937 !important;
+        border-top-color: #404040 !important;
+      }
+      .footer-text {
+        color: #9ca3af !important;
+      }
+      .signature {
+        color: #d1d5db !important;
+        border-top-color: #404040 !important;
+      }
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #0f5132 0%, #198754 100%);
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 4px solid #b8922a;
+    }
+.logo {
+  width: 80px;          /* เพิ่มจาก 80px */
+  height: 80px;         /* เพิ่มจาก 80px */
+  margin: 0 auto 15px;
+  border-radius: 12px;   /* เปลี่ยนจากวงกลม (50%) เป็นมุมโค้งนิดหน่อย */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .header p {
+      color: #e9ecef;
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
+    .content {
+      padding: 30px 25px;
+      color: #343a40;
+      line-height: 1.8;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f5132;
+      margin-bottom: 15px;
+    }
+    .message {
+      font-size: 15px;
+      color: #495057;
+      margin-bottom: 20px;
+    }
+    .info-box {
+      background: #f8f9fa;
+      border-left: 4px solid #0f5132;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    .info-box h3 {
+      color: #0f5132;
+      font-size: 16px;
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+    .info-row {
+      display: flex;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #495057;
+      min-width: 120px;
+      font-size: 14px;
+    }
+    .info-value {
+      color: #6c757d;
+      flex: 1;
+      font-size: 14px;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #0f5132 0%, #198754 100%);
+      color: #ffffff !important;
+      padding: 14px 32px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(15, 81, 50, 0.3);
+    }
+    .divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #b8922a, transparent);
+      margin: 25px 0;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 25px;
+      text-align: center;
+      border-top: 1px solid #e9ecef;
+    }
+    .footer-title {
+      color: #0f5132;
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .footer-text {
+      color: #6c757d;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 5px 0;
+    }
+    .footer-contact {
+      color: #495057;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .footer-contact a {
+      color: #0f5132;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .signature {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px solid #e9ecef;
+      font-size: 14px;
+      color: #495057;
+    }
+    .signature-name {
+      font-weight: 600;
+      color: #0f5132;
+    }
+    .highlight {
+      background: linear-gradient(120deg, #fff3cd 0%, #ffe69c 100%);
+      padding: 12px 16px;
+      border-radius: 6px;
+      border-left: 4px solid #b8922a;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+    .status-badge {
+      display: inline-block;
+      background: #d4edda;
+      color: #155724;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+    /* Icons แบบ Safe สำหรับ Email */
+    .icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      margin-right: 5px;
+      font-weight: bold;
+    }
+    .icon-check { color: #28a745; }
+    .icon-info { color: #17a2b8; }
+    .icon-doc { color: #6c757d; }
+    .icon-folder { color: #ffc107; }
+    .icon-time { color: #fd7e14; }
+    .icon-mail { color: #007bff; }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        margin: 10px;
+        border-radius: 8px;
+      }
+      .content {
+        padding: 20px 15px;
+      }
+      .header {
+        padding: 25px 15px;
+      }
+      .info-row {
+        flex-direction: column;
+      }
+      .info-label {
+        min-width: auto;
+        margin-bottom: 4px;
+      }
+      .button {
+        display: block;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    ${content}
+  </div>
+</body>
+</html>
+  `;
+}
+
+// ===============================
 // Process Application
 // ===============================
 
 function processApplication(data) {
   try {
+    Logger.log('='.repeat(50));
+    Logger.log('🚀 Starting processApplication');
+    Logger.log('='.repeat(50));
+    
+    // Log basic info
+    Logger.log('📋 Applicant: ' + data.fullnameTH);
+    Logger.log('📋 Position: ' + data.position);
+    Logger.log('📸 Has photo: ' + (data.photo ? 'Yes' : 'No'));
+    Logger.log('📄 Has documents: ' + (data.documents ? 'Yes' : 'No'));
+    
+    if (data.documents) {
+      Logger.log('Documents provided:');
+      for (const [key, value] of Object.entries(data.documents)) {
+        if (value && value.data) {
+          const dataLength = value.data.length;
+          Logger.log(`  - ${key}: ${value.name} (${dataLength} chars)`);
+        }
+      }
+    }
+    
     // 1. Get/Create folder structure
     const folders = getOrCreateFolderStructure();
+    Logger.log('✓ Got folder structure');
     
     // 2. Create applicant folder
     const timestamp = Utilities.formatDate(new Date(), 'GMT+7', 'yyyyMMdd_HHmmss');
@@ -52,24 +349,36 @@ function processApplication(data) {
     const applicantFolder = folders.applicants.createFolder(folderName);
     
     Logger.log('✓ Created folder: ' + folderName);
+    Logger.log('  Folder ID: ' + applicantFolder.getId());
     
     // 3. Save documents to applicant folder
     if (data.documents) {
-      saveDocuments(data.documents, applicantFolder);
+      Logger.log('📄 Attempting to save documents...');
+      const savedCount = saveDocuments(data.documents, applicantFolder);
+      Logger.log(`✓ Saved ${savedCount} document(s)`);
+    } else {
+      Logger.log('⚠ No documents to save');
     }
     
     // 4. Create PDF application
+    Logger.log('📑 Creating PDF application...');
     const pdfUrl = createApplicationPDF(data, folders.applications, folderName);
-    Logger.log('✓ Created PDF');
+    Logger.log('✓ Created PDF: ' + pdfUrl);
     
     // 5. Save to Google Sheets
+    Logger.log('📊 Saving to Google Sheets...');
     saveToSheet(data, applicantFolder.getUrl(), pdfUrl);
     Logger.log('✓ Saved to Sheets');
     
     // 6. Send emails
+    Logger.log('📧 Sending emails...');
     sendApplicantEmail(data, pdfUrl);
     sendAdminEmail(data, applicantFolder.getUrl(), pdfUrl);
     Logger.log('✓ Sent emails');
+    
+    Logger.log('='.repeat(50));
+    Logger.log('✅ Process completed successfully!');
+    Logger.log('='.repeat(50));
     
     return {
       folderId: applicantFolder.getId(),
@@ -78,7 +387,11 @@ function processApplication(data) {
     };
     
   } catch (error) {
-    Logger.log('❌ Error processing: ' + error.toString());
+    Logger.log('='.repeat(50));
+    Logger.log('❌ Error in processApplication');
+    Logger.log('Error: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
+    Logger.log('='.repeat(50));
     throw error;
   }
 }
@@ -89,6 +402,13 @@ function processApplication(data) {
 
 function saveDocuments(documents, folder) {
   try {
+    Logger.log('📄 Starting to save documents...');
+    
+    if (!documents) {
+      Logger.log('⚠ No documents data provided');
+      return 0;
+    }
+    
     const docNames = {
       diplomaCopy: 'สำเนาปริญญาบัตร',
       nationalIDCopy: 'สำเนาบัตรประชาชน',
@@ -102,37 +422,52 @@ function saveDocuments(documents, folder) {
     let savedCount = 0;
     
     for (const [key, value] of Object.entries(documents)) {
+      Logger.log(`Processing ${key}...`);
+      
       if (value && value.data) {
         try {
-          // แยก base64 data
-          const base64Parts = value.data.split(',');
-          if (base64Parts.length < 2) continue;
+          let fileData = value.data;
           
-          const fileData = base64Parts[1];
-          const mimeType = 'application/pdf';
+          // ถ้ามี data URL prefix ให้แยกออก
+          if (value.data.includes(',')) {
+            const base64Parts = value.data.split(',');
+            fileData = base64Parts[1];
+            Logger.log(`  Extracted base64 data (length: ${fileData.length})`);
+          }
           
-          // Decode and create blob
+          // Decode base64
+          const decodedData = Utilities.base64Decode(fileData);
+          Logger.log(`  Decoded data (size: ${decodedData.length} bytes)`);
+          
+          // สร้าง blob
           const fileBlob = Utilities.newBlob(
-            Utilities.base64Decode(fileData),
-            mimeType,
+            decodedData,
+            'application/pdf',
             `${docNames[key]}.pdf`
           );
           
-          // Save to folder
-          folder.createFile(fileBlob);
+          // บันทึกไฟล์
+          const savedFile = folder.createFile(fileBlob);
           savedCount++;
           
-          Logger.log(`✓ Saved: ${docNames[key]}`);
+          Logger.log(`✓ Saved: ${docNames[key]} (${savedFile.getSize()} bytes)`);
+          
         } catch (error) {
           Logger.log(`❌ Error saving ${key}: ${error.toString()}`);
+          Logger.log(`   Stack: ${error.stack}`);
         }
+      } else {
+        Logger.log(`  Skipped ${key} (no data)`);
       }
     }
     
     Logger.log(`✓ Saved ${savedCount} document(s) to folder`);
+    return savedCount;
     
   } catch (error) {
     Logger.log('❌ Error in saveDocuments: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
+    return 0;
   }
 }
 
@@ -180,13 +515,26 @@ function createApplicationPDF(data, folder, fileName) {
     const presentation = SlidesApp.openById(newSlide.getId());
     const slides = presentation.getSlides();
     
+    // IMPORTANT: Insert photo FIRST before replacing other placeholders
+    // This is because we need to find {{photo}} text placeholder
+    if (data.photo) {
+      Logger.log('📸 Inserting photo first...');
+      const photoInserted = insertPhotoInSlide(slides, data.photo);
+      if (photoInserted) {
+        Logger.log('✓ Photo inserted successfully');
+      } else {
+        Logger.log('⚠ Photo insertion failed or {{photo}} not found');
+      }
+    } else {
+      Logger.log('⚠ No photo data provided');
+    }
+    
+    // Now replace all other placeholders
+    Logger.log('📝 Replacing text placeholders...');
     slides.forEach(slide => {
       replacePlaceholdersInSlide(slide, data);
     });
-    
-    if (data.photo) {
-      insertPhotoInSlide(slides, data.photo);
-    }
+    Logger.log('✓ Text placeholders replaced');
     
     presentation.saveAndClose();
     Utilities.sleep(2000);
@@ -255,7 +603,8 @@ function replacePlaceholders(text, data) {
   replace('date', formatDateThai(new Date()));
   
   // Page 2: Basic Info
-  replace('photo', '[รูปถ่าย]');
+  // Note: {{photo}} will be replaced by insertPhotoInSlide() function
+  // Do not replace it here!
   replace('position', data.position);
   replace('department', data.department);
   replace('checkbox1', data.checkbox1 ? '☑' : '☐');
@@ -457,59 +806,91 @@ function insertPhotoInSlide(slides, photoBase64) {
       return;
     }
     
+    Logger.log('📸 Attempting to insert photo...');
+    
     // แยก base64 data
-    const base64Parts = photoBase64.split(',');
-    if (base64Parts.length < 2) {
-      Logger.log('❌ Invalid photo format');
-      return;
+    let imageData = photoBase64;
+    let mimeType = 'image/jpeg';
+    
+    // ถ้ามี data URL prefix ให้แยกออก
+    if (photoBase64.includes(',')) {
+      const base64Parts = photoBase64.split(',');
+      imageData = base64Parts[1];
+      
+      // ดึง MIME type
+      const mimeMatch = base64Parts[0].match(/:(.*?);/);
+      if (mimeMatch) {
+        mimeType = mimeMatch[1];
+      }
     }
     
-    const imageData = base64Parts[1];
-    const mimeType = base64Parts[0].match(/:(.*?);/)[1];
+    Logger.log('MIME Type: ' + mimeType);
     
+    // ค้นหา {{photo}} placeholder
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
       const shapes = slide.getShapes();
+      
+      Logger.log(`Checking slide ${i + 1}, shapes: ${shapes.length}`);
       
       for (let j = 0; j < shapes.length; j++) {
         const shape = shapes[j];
         
         try {
-          const text = shape.getText().asString();
+          const textRange = shape.getText();
+          const text = textRange.asString();
           
-          if (text.includes('{{photo}}')) {
-            // Get shape position and size
+          Logger.log(`  Shape ${j}: "${text.substring(0, 50)}"`);
+          
+          if (text.indexOf('{{photo}}') !== -1) {
+            Logger.log('✓ Found {{photo}} placeholder!');
+            
+            // เก็บตำแหน่งและขนาด
             const left = shape.getLeft();
             const top = shape.getTop();
             const width = shape.getWidth();
             const height = shape.getHeight();
             
-            // Remove the shape
-            shape.remove();
+            Logger.log(`Position: left=${left}, top=${top}, width=${width}, height=${height}`);
             
-            // Decode base64 and create blob
-            const imageBlob = Utilities.newBlob(
-              Utilities.base64Decode(imageData), 
-              mimeType,
-              'photo.jpg'
-            );
-            
-            // Insert image at the same position
-            const insertedImage = slide.insertImage(imageBlob, left, top, width, height);
-            
-            Logger.log('✓ Successfully inserted photo in slide ' + (i + 1));
-            return;
+            try {
+              // Decode base64
+              const decodedData = Utilities.base64Decode(imageData);
+              
+              // สร้าง blob
+              const imageBlob = Utilities.newBlob(decodedData, mimeType, 'photo.jpg');
+              
+              Logger.log('✓ Created image blob');
+              
+              // ลบ shape เดิม
+              shape.remove();
+              Logger.log('✓ Removed placeholder shape');
+              
+              // แทรกรูป
+              const insertedImage = slide.insertImage(imageBlob, left, top, width, height);
+              Logger.log('✓ Successfully inserted photo in slide ' + (i + 1));
+              
+              return true;
+              
+            } catch (imgError) {
+              Logger.log('❌ Error creating/inserting image: ' + imgError.toString());
+              throw imgError;
+            }
           }
-        } catch (error) {
-          // Continue to next shape
+        } catch (shapeError) {
+          // Shape อาจไม่มี text, ข้ามไป
+          Logger.log(`  Shape ${j}: No text or error - ${shapeError.toString()}`);
         }
       }
     }
     
     Logger.log('⚠ {{photo}} placeholder not found in any slide');
+    return false;
     
   } catch (error) {
-    Logger.log('❌ Error inserting photo: ' + error.toString());
+    Logger.log('❌ Error in insertPhotoInSlide: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
+    return false;
   }
 }
 
@@ -591,31 +972,115 @@ function getOrCreateSpreadsheet() {
 }
 
 // ===============================
-// Send Emails
+// อีเมลผู้สมัคร - ไม่มีปุ่มดาวน์โหลด
 // ===============================
 
 function sendApplicantEmail(data, pdfUrl) {
   try {
-    const subject = `ยืนยันการสมัครงาน - ${data.position} - ${CONFIG.ORG_NAME}`;
+    const subject = `[✓] ยืนยันการสมัครงาน - ${data.position} - ${CONFIG.ORG_NAME}`;
     
-    const body = `
-เรียน ${data.fullnameTH}
-
-ขอบคุณที่สมัครงานตำแหน่ง ${data.position} ${CONFIG.ORG_NAME}
-
-เราได้รับใบสมัครของคุณเรียบร้อยแล้ว ทางเราจะพิจารณาคุณสมบัติและติดต่อกลับภายใน 7-14 วันทำการ
-
-ท่านสามารถดาวน์โหลดสำเนาใบสมัครได้ที่:
-${pdfUrl}
-
-หากมีข้อสงสัยประการใด กรุณาติดต่อ:
-อีเมล: ${CONFIG.ADMIN_EMAIL}
-
-ขอแสดงความนับถือ
-${CONFIG.ORG_NAME}
-    `.trim();
+    const emailContent = `
+      <div class="header">
+<div class="logo">
+  <img src="${CONFIG.LOGO_URL}" 
+       alt="${CONFIG.ORG_NAME}" 
+       style="width: 100%; height: 100%; object-fit: contain; padding: 8px;">
+</div>
+        <h1>${CONFIG.ORG_NAME}</h1>
+        <p>ระบบรับสมัครงานออนไลน์</p>
+      </div>
+      
+      <div class="content">
+        <div class="greeting">
+          เรียน คุณ${data.fullnameTH}
+        </div>
+        
+        <div class="status-badge">
+          <span class="icon icon-check">✓</span> ได้รับใบสมัครเรียบร้อยแล้ว
+        </div>
+        
+        <div class="message">
+          ขอขอบคุณที่ท่านให้ความสนใจสมัครงานกับ${CONFIG.ORG_NAME} 
+          เราได้รับใบสมัครของท่านเรียบร้อยแล้ว และขณะนี้อยู่ระหว่างการพิจารณา
+        </div>
+        
+        <div class="info-box">
+          <h3><span class="icon icon-info">i</span> ข้อมูลการสมัคร</h3>
+          <div class="info-row">
+            <span class="info-label">ตำแหน่ง:</span>
+            <span class="info-value"><strong>${data.position}</strong></span>
+          </div>
+          ${data.department ? `
+          <div class="info-row">
+            <span class="info-label">หน่วยงาน:</span>
+            <span class="info-value">${data.department}</span>
+          </div>
+          ` : ''}
+          <div class="info-row">
+            <span class="info-label">วันที่สมัคร:</span>
+            <span class="info-value">${formatDateThai(new Date())}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">อีเมล:</span>
+            <span class="info-value">${data.email}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">โทรศัพท์:</span>
+            <span class="info-value">${data.tel}</span>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="highlight">
+          <strong><span class="icon icon-time">⏱</span> ระยะเวลาพิจารณา:</strong> ทางสถาบันฯ จะพิจารณาคุณสมบัติและติดต่อกลับภายใน 
+          <strong>7-14 วันทำการ</strong>
+        </div>
+        
+        <div class="message" style="font-size: 14px; color: #6c757d;">
+          <strong>หมายเหตุ:</strong> 
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>หากท่านผ่านการพิจารณาเบื้องต้น ทางสถาบันฯ จะติดต่อเพื่อนัดหมายสัมภาษณ์</li>
+            <li>หากไม่ได้รับการติดต่อภายใน 14 วันทำการ อาจหมายความว่าท่านไม่ผ่านการพิจารณาในครั้งนี้</li>
+            <li>ท่านสามารถติดตามข่าวสารการรับสมัครงานเพิ่มเติมได้ที่เว็บไซต์สถาบันฯ</li>
+          </ul>
+        </div>
+        
+        <div class="signature">
+          <div style="text-align: center;">
+            <div class="signature-name">${CONFIG.ORG_NAME}</div>
+            <div style="color: #6c757d; font-size: 13px; margin-top: 5px;">
+              ฝ่ายทรัพยากรบุคคล
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <div class="footer-title">${CONFIG.ORG_NAME}</div>
+        <p class="footer-text">${CONFIG.ORG_ADDRESS}</p>
+        <div class="footer-contact">
+          <span class="icon icon-mail">@</span> อีเมล: <a href="mailto:${CONFIG.ADMIN_EMAIL}">${CONFIG.ADMIN_EMAIL}</a>
+        </div>
+        <p class="footer-text" style="margin-top: 15px; font-size: 12px; color: #868e96;">
+          อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาอย่าตอบกลับ<br>
+          &copy; ${new Date().getFullYear()} ${CONFIG.ORG_NAME}. All rights reserved.
+        </p>
+      </div>
+    `;
     
-    GmailApp.sendEmail(data.email, subject, body);
+    const htmlBody = createEmailTemplate(emailContent);
+    
+    GmailApp.sendEmail(
+      data.email,
+      subject,
+      '', 
+      {
+        htmlBody: htmlBody,
+        name: CONFIG.ORG_NAME
+      }
+    );
+    
     Logger.log('✓ Sent email to: ' + data.email);
     
   } catch (error) {
@@ -623,39 +1088,193 @@ ${CONFIG.ORG_NAME}
   }
 }
 
+// ===============================
+// อีเมลแอดมิน - มีปุ่มดาวน์โหลด
+// ===============================
+
 function sendAdminEmail(data, folderUrl, pdfUrl) {
   try {
-    const subject = `[ใบสมัครใหม่] ${data.fullnameTH} - ${data.position}`;
+    const subject = `[!] ใบสมัครใหม่: ${data.fullnameTH} - ${data.position}`;
     
-    const body = `
-มีผู้สมัครงานใหม่
-
-ข้อมูลผู้สมัคร:
-- ชื่อ: ${data.fullnameTH}
-- ตำแหน่ง: ${data.position}
-- หน่วยงาน: ${data.department || '-'}
-- อีเมล: ${data.email}
-- โทรศัพท์: ${data.tel}
-- การศึกษา: ${data.educationLevel1 || '-'} ${data.fieldofStudy1 || ''}
-- สถาบัน: ${data.nameofEducation1 || '-'}
-- อัตราเงินเดือนที่ต้องการ: ${data.salary} บาท
-
-โฟลเดอร์เอกสาร:
-${folderUrl}
-
-ใบสมัคร PDF:
-${pdfUrl}
-
-กรุณาตรวจสอบและดำเนินการต่อไป
-    `.trim();
+    const emailContent = `
+      <div class="header">
+<div class="logo">
+  <img src="${CONFIG.LOGO_URL}" 
+       alt="${CONFIG.ORG_NAME}" 
+       style="width: 100%; height: 100%; object-fit: contain; padding: 8px;">
+</div>
+        <h1>แจ้งเตือนผู้สมัครงานใหม่</h1>
+        <p>${CONFIG.ORG_NAME}</p>
+      </div>
+      
+      <div class="content">
+        <div class="greeting">
+          เรียน ฝ่ายทรัพยากรบุคคล
+        </div>
+        
+        <div class="status-badge" style="background: #cfe2ff; color: #084298;">
+          <span class="icon">!</span> มีผู้สมัครงานใหม่เข้ามาในระบบ
+        </div>
+        
+        <div class="message">
+          มีผู้สมัครงานเข้ามาในระบบเมื่อสักครู่ กรุณาตรวจสอบและดำเนินการต่อไป
+        </div>
+        
+        <div class="info-box">
+          <h3>ข้อมูลผู้สมัคร</h3>
+          <div class="info-row">
+            <span class="info-label">ชื่อ-นามสกุล:</span>
+            <span class="info-value"><strong>${data.fullnameTH}</strong></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">ชื่อ-นามสกุล (EN):</span>
+            <span class="info-value">${data.fullnameEN || '-'}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">อีเมล:</span>
+            <span class="info-value">${data.email}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">โทรศัพท์:</span>
+            <span class="info-value">${data.tel}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">อายุ:</span>
+            <span class="info-value">${data.age} ปี</span>
+          </div>
+        </div>
+        
+        <div class="info-box">
+          <h3>ข้อมูลตำแหน่งที่สมัคร</h3>
+          <div class="info-row">
+            <span class="info-label">ตำแหน่ง:</span>
+            <span class="info-value"><strong>${data.position}</strong></span>
+          </div>
+          ${data.department ? `
+          <div class="info-row">
+            <span class="info-label">หน่วยงาน:</span>
+            <span class="info-value">${data.department}</span>
+          </div>
+          ` : ''}
+          <div class="info-row">
+            <span class="info-label">เงินเดือนที่ต้องการ:</span>
+            <span class="info-value">${Number(data.salary).toLocaleString('th-TH')} บาท</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">วันที่พร้อมเริ่มงาน:</span>
+            <span class="info-value">${formatDateThai(data.startDate)}</span>
+          </div>
+        </div>
+        
+        <div class="info-box">
+          <h3>คุณวุฒิการศึกษา</h3>
+          <div class="info-row">
+            <span class="info-label">การศึกษา:</span>
+            <span class="info-value">${data.educationLevel1 || '-'}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">สาขาวิชา:</span>
+            <span class="info-value">${data.fieldofStudy1 || '-'}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">สถาบัน:</span>
+            <span class="info-value">${data.nameofEducation1 || '-'}</span>
+          </div>
+          ${data.gpa1 ? `
+          <div class="info-row">
+            <span class="info-label">GPA:</span>
+            <span class="info-value">${data.gpa1}</span>
+          </div>
+          ` : ''}
+        </div>
+        
+        ${data.companyName1 ? `
+        <div class="info-box">
+          <h3>ประสบการณ์ทำงานล่าสุด</h3>
+          <div class="info-row">
+            <span class="info-label">บริษัท:</span>
+            <span class="info-value">${data.companyName1}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">ตำแหน่งสุดท้าย:</span>
+            <span class="info-value">${data.comp1positionEnd || '-'}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">เงินเดือนสุดท้าย:</span>
+            <span class="info-value">${data.comp1salaryEnd ? Number(data.comp1salaryEnd).toLocaleString('th-TH') + ' บาท' : '-'}</span>
+          </div>
+        </div>
+        ` : ''}
+        
+        <div class="divider"></div>
+        
+        <div class="message">
+          <strong><span class="icon icon-folder">□</span> เอกสารและลิงก์สำคัญ:</strong>
+        </div>
+        
+        <center>
+          <a href="${folderUrl}" class="button" style="margin: 10px;">
+            <span class="icon-folder">□</span> เปิดโฟลเดอร์เอกสาร
+          </a>
+          <a href="${pdfUrl}" class="button" style="margin: 10px; background: linear-gradient(135deg, #b8922a 0%, #d4af37 100%);">
+            <span class="icon-doc">▢</span> ดูใบสมัคร PDF
+          </a>
+        </center>
+        
+        <div class="highlight">
+          <strong>สิ่งที่ต้องดำเนินการ:</strong>
+          <ol style="margin: 10px 0 0; padding-left: 20px; line-height: 1.8;">
+            <li>ตรวจสอบคุณสมบัติของผู้สมัคร</li>
+            <li>ทบทวนเอกสารแนบและใบสมัครงาน</li>
+            <li>ประเมินความเหมาะสมกับตำแหน่ง</li>
+            <li>ดำเนินการนัดหมายสัมภาษณ์ (หากผ่านการพิจารณา)</li>
+          </ol>
+        </div>
+        
+        <div class="signature">
+          <div style="text-align: center;">
+            <div style="color: #6c757d; font-size: 13px;">
+              ส่งจากระบบรับสมัครงานอัตโนมัติ<br>
+              ${CONFIG.ORG_NAME}
+            </div>
+            <div style="color: #868e96; font-size: 12px; margin-top: 8px;">
+              ${formatDateThai(new Date())} เวลา ${Utilities.formatDate(new Date(), 'GMT+7', 'HH:mm:ss')} น.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <div class="footer-title">${CONFIG.ORG_NAME}</div>
+        <p class="footer-text">ระบบรับสมัครงานออนไลน์</p>
+        <div class="footer-contact">
+          <span class="icon icon-mail">@</span> อีเมล: <a href="mailto:${CONFIG.ADMIN_EMAIL}">${CONFIG.ADMIN_EMAIL}</a>
+        </div>
+        <p class="footer-text" style="margin-top: 15px; font-size: 12px; color: #868e96;">
+          &copy; ${new Date().getFullYear()} ${CONFIG.ORG_NAME}. All rights reserved.
+        </p>
+      </div>
+    `;
     
-    GmailApp.sendEmail(CONFIG.ADMIN_EMAIL, subject, body);
+    const htmlBody = createEmailTemplate(emailContent);
+    
+    GmailApp.sendEmail(
+      CONFIG.ADMIN_EMAIL,
+      subject,
+      '', 
+      {
+        htmlBody: htmlBody,
+        name: 'ระบบรับสมัครงาน - ' + CONFIG.ORG_NAME
+      }
+    );
+    
     Logger.log('✓ Sent email to admin');
     
   } catch (error) {
     Logger.log('❌ Error sending admin email: ' + error.toString());
   }
 }
+
 
 // ===============================
 // Utility Functions
@@ -691,7 +1310,16 @@ function formatPhone(phone) {
 // ===============================
 
 function testApplication() {
+  // รูปทดสอบ: จุดสีแดง 1x1 pixel (PNG)
+  const testPhotoBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
+  
+  // PDF ทดสอบ (ขนาดเล็ก แต่ valid)
+  const testPDFBase64 = 'data:application/pdf;base64,JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKL01lZGlhQm94IFswIDAgNjEyIDc5Ml0KPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA0IDAgUgo+Pgo+PgovQ29udGVudHMgNSAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9MZW5ndGggNDQKPj4Kc3RyZWFtCkJUCi9GMSA4IFRmCjUwIDcwMCBUZAooVGVzdCBEb2N1bWVudCkgVGoKRVQKZW5kc3RyZWFtCmVuZG9iago=';
+  
   const testData = {
+    // ⭐⭐⭐ สำคัญที่สุด: ต้องมี photo! ⭐⭐⭐
+    photo: testPhotoBase64,
+    
     position: 'นักวิชาการ',
     department: 'ฝ่ายวิจัย',
     checkbox1: true,
@@ -756,10 +1384,14 @@ function testApplication() {
     husbandwifeAddress: '123 ถนนทดสอบ กรุงเทพฯ 10100',
     husbandwifeofficeTel: '0898765433',
     documents: {
-      diplomaCopy: { name: 'diploma.pdf', data: 'data:application/pdf;base64,JVBERi0xLjQK...' },
-      nationalIDCopy: { name: 'id.pdf', data: 'data:application/pdf;base64,JVBERi0xLjQK...' }
+      diplomaCopy: { name: 'diploma.pdf', data: testPDFBase64 },
+      nationalIDCopy: { name: 'id.pdf', data: testPDFBase64 }
     }
   };
+  
+  Logger.log('🧪 Starting test...');
+  Logger.log('📸 Photo data length: ' + testData.photo.length);
+  Logger.log('📄 Documents count: ' + Object.keys(testData.documents).length);
   
   const result = processApplication(testData);
   Logger.log('✓ Test completed: ' + JSON.stringify(result));

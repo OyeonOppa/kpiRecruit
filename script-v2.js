@@ -674,11 +674,29 @@ function addReference() {
 }
 
 // ==================== Step Navigation ====================
+// ==================== Step Navigation ====================
 function changeStep(direction) {
+    // ⭐ เช็ค checkbox1 ใน step 1 ก่อน
+    if (direction === 1 && currentStep === 1) {
+        const cb = document.getElementById('checkbox1');
+        if (cb && cb.required && !cb.checked) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณายืนยัน',
+                text: 'กรุณาเลือกยินดีรับตำแหน่งตามที่สถาบันพระปกเกล้าพิจารณาความเหมาะสมก่อนดำเนินการต่อ',
+                confirmButtonColor: '#0f5132',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
+        }
+    }
+
+    // ⭐ Validate step ก่อนไปต่อ
     if (direction === 1 && !validateStep(currentStep)) {
         return;
     }
 
+    // ⭐ เปลี่ยน step
     const newStep = currentStep + direction;
     if (newStep < 1 || newStep > totalSteps) return;
 
@@ -1074,21 +1092,3 @@ function hideLoading() {
         loadingOverlay.classList.add('hidden');
     }
 }
-
-function changeStep(delta) {
-    // ถ้ากดไปข้างหน้าจาก step1 ให้ตรวจสอบ checkbox1
-    const currentStep = document.querySelector('.form-step:not(.hidden)');
-    const currentId = currentStep && currentStep.id;
-
-    if (delta > 0 && currentId === 'step1') {
-        const cb = document.getElementById('checkbox1');
-        if (cb && cb.required && !cb.checked) {
-            // ใช้ SweetAlert2 ที่มีอยู่แล้ว
-            Swal.fire({
-                icon: 'warning',
-                title: 'กรุณายืนยัน',
-                text: 'กรุณาเลือกยินดีรับตำแหน่งตามที่สถาบันพระปกเกล้าพิจารณาความเหมาะสมก่อนดำเนินการต่อ'
-            });
-            return; // หยุดไม่ให้ไปขั้นถัดไป
-        }
-    }}

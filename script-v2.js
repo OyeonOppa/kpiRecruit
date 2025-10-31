@@ -296,14 +296,22 @@ function addEducation() {
     }
     educationCount++;
     
+    // ⭐ entry แรกต้อง required
+    const isFirstEntry = educationCount === 1;
+    const requiredAttr = isFirstEntry ? 'required' : '';
+    const requiredClass = isFirstEntry ? 'required' : '';
+    
     const container = document.getElementById('educationContainer');
     const html = `
         <div class="education-entry border rounded p-3 mb-3" id="education${educationCount}">
-            <h6>ประวัติการศึกษา ${educationCount}</h6>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6>ประวัติการศึกษา ${educationCount} ${isFirstEntry ? '<span style="color: #dc2626;">*</span>' : ''}</h6>
+                ${!isFirstEntry ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEducation(${educationCount})">ลบ</button>` : ''}
+            </div>
             <div class="row mb-2">
                 <div class="col-md-6">
-                    <label class="form-label">ระดับการศึกษา</label>
-                    <select class="form-select" id="educationLevel${educationCount}" name="educationLevel${educationCount}">
+                    <label class="form-label ${requiredClass}">ระดับการศึกษา</label>
+                    <select class="form-select" id="educationLevel${educationCount}" name="educationLevel${educationCount}" ${requiredAttr}>
                         <option value="">เลือก</option>
                         <option value="ปริญญาตรี">ปริญญาตรี</option>
                         <option value="ปริญญาโท">ปริญญาโท</option>
@@ -311,37 +319,69 @@ function addEducation() {
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">ตั้งแต่ปี (พ.ศ.)</label>
-                    <input type="number" class="form-control" id="eduSincetheyear${educationCount}" name="eduSincetheyear${educationCount}">
+                    <label class="form-label ${requiredClass}">ตั้งแต่ปี (พ.ศ.)</label>
+                    <input type="number" class="form-control no-spin" id="eduSincetheyear${educationCount}" name="eduSincetheyear${educationCount}" ${requiredAttr}>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">จนถึงปี (พ.ศ.)</label>
-                    <input type="number" class="form-control" id="eduUntiltheyear${educationCount}" name="eduUntiltheyear${educationCount}">
+                    <label class="form-label ${requiredClass}">จนถึงปี (พ.ศ.)</label>
+                    <input type="number" class="form-control no-spin" id="eduUntiltheyear${educationCount}" name="eduUntiltheyear${educationCount}" ${requiredAttr}>
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-12">
-                    <label class="form-label">ชื่อสถานศึกษา</label>
-                    <input type="text" class="form-control" id="nameofEducation${educationCount}" name="nameofEducation${educationCount}">
+                    <label class="form-label ${requiredClass}">ชื่อสถานศึกษา</label>
+                    <input type="text" class="form-control" id="nameofEducation${educationCount}" name="nameofEducation${educationCount}" ${requiredAttr}>
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-4">
-                    <label class="form-label">วุฒิการศึกษา</label>
-                    <input type="text" class="form-control" id="qualifications${educationCount}" name="qualifications${educationCount}">
+                    <label class="form-label ${requiredClass}">วุฒิการศึกษา</label>
+                    <input type="text" class="form-control" id="qualifications${educationCount}" name="qualifications${educationCount}" ${requiredAttr}>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">สาขาวิชา</label>
-                    <input type="text" class="form-control" id="fieldofStudy${educationCount}" name="fieldofStudy${educationCount}">
+                    <label class="form-label ${requiredClass}">สาขาวิชา</label>
+                    <input type="text" class="form-control" id="fieldofStudy${educationCount}" name="fieldofStudy${educationCount}" ${requiredAttr}>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">GPA</label>
-                    <input type="number" step="0.01" class="form-control" id="gpa${educationCount}" name="gpa${educationCount}">
+                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${educationCount}" name="gpa${educationCount}">
                 </div>
             </div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+}
+
+function removeEducation(index) {
+    // ไม่ให้ลบ entry แรก
+    if (index === 1) {
+        Swal.fire({
+            title: 'ไม่สามารถลบได้',
+            text: 'กรุณากรอกประวัติการศึกษาอย่างน้อย 1 รายการ',
+            icon: 'warning',
+            confirmButtonColor: '#0f5132',
+            confirmButtonText: 'ตกลง'
+        });
+        return;
+    }
+    
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: 'คุณต้องการลบประวัติการศึกษารายการนี้หรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f5132',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const element = document.getElementById(`education${index}`);
+            if (element) {
+                element.remove();
+            }
+        }
+    });
 }
 
 // Experience
@@ -409,15 +449,15 @@ function addExperience() {
             <div class="row mb-2">
                 <div class="col-md-4">
                     <label class="form-label">เงินเดือนแรกเข้า</label>
-                    <input type="number" class="form-control" id="comp${experienceCount}salaryStart" name="comp${experienceCount}salaryStart">
+                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryStart" name="comp${experienceCount}salaryStart">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">เงินเดือนสุดท้าย</label>
-                    <input type="number" class="form-control" id="comp${experienceCount}salaryEnd" name="comp${experienceCount}salaryEnd">
+                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryEnd" name="comp${experienceCount}salaryEnd">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">รายได้อื่นๆ</label>
-                    <input type="number" class="form-control" id="comp${experienceCount}salaryEtc" name="comp${experienceCount}salaryEtc">
+                    <input type="number" class="form-control no-spin" id="comp${experienceCount}salaryEtc" name="comp${experienceCount}salaryEtc">
                 </div>
             </div>
             <div class="mb-2">
@@ -700,6 +740,40 @@ function validateStep(step) {
         });
         document.getElementById('photo').focus();
         return false;
+    }
+    // ⭐ เพิ่มส่วนนี้: เช็คประวัติการศึกษา (step 3)
+    if (step === 3) {
+        // เช็คว่ามี education entry อย่างน้อย 1 อัน
+        if (educationCount < 1) {
+            Swal.fire({
+                title: 'กรุณากรอกประวัติการศึกษา',
+                text: 'กรุณาเพิ่มประวัติการศึกษาอย่างน้อย 1 รายการ',
+                icon: 'warning',
+                confirmButtonColor: '#0f5132',
+                confirmButtonText: 'ตกลง'
+            });
+            return false;
+        }
+        
+        // เช็คว่า entry แรกมีข้อมูลครบ
+        const edu1Level = document.getElementById('educationLevel1');
+        const edu1Name = document.getElementById('nameofEducation1');
+        const edu1Qual = document.getElementById('qualifications1');
+        const edu1Field = document.getElementById('fieldofStudy1');
+        
+        if (!edu1Level || !edu1Level.value || 
+            !edu1Name || !edu1Name.value || 
+            !edu1Qual || !edu1Qual.value || 
+            !edu1Field || !edu1Field.value) {
+            Swal.fire({
+                title: 'ข้อมูลการศึกษาไม่ครบถ้วน',
+                text: 'กรุณากรอกข้อมูลประวัติการศึกษารายการที่ 1 ให้ครบถ้วน',
+                icon: 'warning',
+                confirmButtonColor: '#0f5132',
+                confirmButtonText: 'ตกลง'
+            });
+            return false;
+        }
     }
 
     return true;
@@ -1000,3 +1074,21 @@ function hideLoading() {
         loadingOverlay.classList.add('hidden');
     }
 }
+
+function changeStep(delta) {
+    // ถ้ากดไปข้างหน้าจาก step1 ให้ตรวจสอบ checkbox1
+    const currentStep = document.querySelector('.form-step:not(.hidden)');
+    const currentId = currentStep && currentStep.id;
+
+    if (delta > 0 && currentId === 'step1') {
+        const cb = document.getElementById('checkbox1');
+        if (cb && cb.required && !cb.checked) {
+            // ใช้ SweetAlert2 ที่มีอยู่แล้ว
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณายืนยัน',
+                text: 'กรุณาเลือกยินดีรับตำแหน่งตามที่สถาบันพระปกเกล้าพิจารณาความเหมาะสมก่อนดำเนินการต่อ'
+            });
+            return; // หยุดไม่ให้ไปขั้นถัดไป
+        }
+    }}

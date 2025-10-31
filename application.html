@@ -87,9 +87,9 @@
 
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="checkbox1" name="checkbox1">
-                                <label class="form-check-label" for="checkbox1">
-                                    ยินดีรับตำแหน่งตามที่สถาบันพระปกเกล้าพิจารณาความเหมาะสม
+                                <input class="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" required>
+                                <label class="form-check-label" for="checkbox1" >
+                                    ยินดีรับตำแหน่งตามที่สถาบันพระปกเกล้าพิจารณาความเหมาะสม <font color="red">*</font>
                                 </label>
                             </div>
                         </div>
@@ -317,15 +317,20 @@
                 </div>
             </div>
 
-            <!-- Step 3: การศึกษาและประสบการณ์ทำงาน -->
-            <div class="form-step hidden" id="step3">
-                <div class="form-card">
-                    <div class="form-header">
-                        <h3>ประวัติการศึกษาและประสบการณ์ทำงาน</h3>
-                    </div>
-                    <div class="form-body">
-                        <h5 class="section-title">ประวัติการศึกษา (เรียงจากล่าสุด)</h5>
-                        
+<!-- Step 3: การศึกษาและประสบการณ์ทำงาน -->
+<div class="form-step hidden" id="step3">
+    <div class="form-card">
+        <div class="form-header">
+            <h3>ประวัติการศึกษาและประสบการณ์ทำงาน</h3>
+        </div>
+        <div class="form-body">
+            <!-- ⭐ เพิ่มดอกจัน (*) -->
+            <h5 class="section-title">ประวัติการศึกษา (เรียงจากล่าสุด) <span style="color: #dc2626;">*</span></h5>
+            
+            <!-- ⭐ เพิ่มข้อความแจ้งเตือน -->
+            <div class="alert alert-info mb-3">
+                <strong>หมายเหตุ:</strong> กรุณากรอกข้อมูลประวัติการศึกษาอย่างน้อย 1 รายการ
+            </div>
                         <!-- Education 1-4 -->
                         <div id="educationContainer">
                             <!-- Will be populated by JavaScript -->
@@ -374,7 +379,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">ปีที่คาดว่าจะจบ</label>
-                                <input type="number" class="form-control" id="expectedgraduationYear" name="expectedgraduationYear">
+                                <input type="number" class="form-control no-spin" id="expectedgraduationYear" name="expectedgraduationYear">
                             </div>
                         </div>
 
@@ -414,10 +419,10 @@
 
                         <hr class="my-4">
 
-                        <h5 class="section-title">ผลงานวิชาการ</h5>
+                        <h5 class="section-title">ผลงานวิชาการ (เฉพาะตำแหน่งนักวิชาการ)</h5>
 
                         <div class="mb-3">
-                            <label class="form-label">ชื่อวิทยานิพนธ์ ผลงานวิจัย ผลงานวิชาการ</label>
+                            <label class="form-label">ชื่อวิทยานิพนธ์ ผลงานวิจัย ผลงานวิชาการ </label>
                             <textarea class="form-control" id="academicWorks" name="academicWorks" rows="3"></textarea>
                         </div>
 

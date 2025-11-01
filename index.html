@@ -20,24 +20,8 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css" />
-
-    <script>
-function sendHeight() {
-  const height = document.documentElement.scrollHeight;
-  window.parent.postMessage(height, "*");
-}
-
-// ส่งความสูงครั้งแรก
-window.addEventListener("load", sendHeight);
-
-// ส่งใหม่เมื่อมีการเปลี่ยนขนาดเนื้อหา
-window.addEventListener("resize", sendHeight);
-new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
-</script>
-
   </head>
   <body>
-
     <div class="container">
       <!-- Header with Logo -->
       <div class="header-section">
@@ -283,6 +267,23 @@ new MutationObserver(sendHeight).observe(document.body, { childList: true, subtr
           //   window.location.href = 'application-v2.html';
           // });
         }
+      });
+    </script>
+
+    <script>
+      function sendHeight() {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage(height, "*");
+      }
+
+      // ส่งความสูงครั้งแรก
+      window.addEventListener("load", sendHeight);
+
+      // ส่งใหม่เมื่อมีการเปลี่ยนขนาดเนื้อหา
+      window.addEventListener("resize", sendHeight);
+      new MutationObserver(sendHeight).observe(document.body, {
+        childList: true,
+        subtree: true,
       });
     </script>
   </body>

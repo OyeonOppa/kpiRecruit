@@ -65,9 +65,20 @@
 
                         <div class="row mb-3">
                             <div class="col-md-8">
-                                <label class="form-label required">ตำแหน่งที่สมัคร</label>
-                                <input type="text" class="form-control" id="position" name="position" placeholder="กรุณาระบุตำแหน่งให้ตรงกับตำแหน่งในประกาศ" required>
-                            </div>
+    <label class="form-label required">ตำแหน่งที่สมัคร</label>
+    <select class="form-control" id="position" name="position" required>
+        <option value="">กรุณาเลือกตำแหน่ง</option>
+        <option value="พนักงานบัญชี">พนักงานบัญชี</option>
+        <option value="พนักงานการเงินและงบประมาณ">พนักงานการเงินและงบประมาณ</option>
+        <option value="พนักงานพัสดุ">พนักงานพัสดุ</option>
+        <option value="พนักงานสื่อสารองค์กรและนักศึกษาสัมพันธ์">พนักงานสื่อสารองค์กรและนักศึกษาสัมพันธ์</option>
+        <option value="พนักงานโสตทัศนศึกษา">พนักงานโสตทัศนศึกษา</option>
+        <option value="พนักงานบริหารงานทั่วไป">พนักงานบริหารงานทั่วไป</option>
+        <option value="พนักงานบริหารอาคารสถานที่">พนักงานบริหารอาคารสถานที่</option>
+        <option value="เจ้าหน้าที่วิเทศสัมพันธ์">เจ้าหน้าที่วิเทศสัมพันธ์</option>
+        <option value="เจ้าหน้าที่บริหารอาคารสถานที่">เจ้าหน้าที่บริหารอาคารสถานที่</option>
+    </select>
+</div>
                             <div class="col-md-4">
                                 <label class="form-label required">อัตราเงินเดือนที่ต้องการ (บาท)</label>
                                 <input type="number" class="form-control no-spin" id="salary" name="salary" required>
@@ -75,14 +86,15 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-8">
+                        <!-- <div class="col-md-8">
                                 <label class="form-label">หน่วยงานที่ต้องการสมัคร (เฉพาะตำแหน่งนักวิชาการ)</label>
                                 <input type="text" class="form-control" id="department" name="department" placeholder="กรุณาระบุสำนัก / วิทยาลัย ที่ท่านต้องการสมัคร">
-                            </div>
+                             </div>
+                        -->
                             <div class="col-md-4">
                                 <label class="form-label required">วันที่พร้อมเริ่มงาน</label>
                                 <input type="date" class="form-control" id="startDate" name="startDate" required>
-                            </div>
+                           </div>
                         </div>
 
                         <div class="mb-3">

@@ -102,7 +102,56 @@ function initializeForm() {
     // Form submission
     document.getElementById('applicationForm').addEventListener('submit', handleSubmit);
     
+    preventInvalidNumberInput();
     showStep(currentStep);
+}
+
+// เพิ่มฟังก์ชันนี้หลังจาก initializeForm()
+function preventInvalidNumberInput() {
+    // หา number inputs ทั้งหมดที่ไม่ required
+    const numberInputs = document.querySelectorAll('input[type="number"]:not([required])');
+    
+    numberInputs.forEach(input => {
+        // เพิ่ม event เพื่อลบ "-" ทันทีที่พิมพ์
+        input.addEventListener('keydown', function(e) {
+            // ถ้ากด "-" ให้ป้องกัน
+            if (e.key === '-' || e.key === 'Minus') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        input.addEventListener('input', function(e) {
+            // ถ้ามีค่าเป็น "-" ให้ลบทิ้ง
+            if (this.value === '-' || this.value === '—') {
+                this.value = '';
+            }
+        });
+        
+        // เพิ่ม placeholder
+        if (!input.placeholder) {
+            input.placeholder = 'ไม่ระบุ';
+        }
+    });
+    
+    // สำหรับ required fields
+    const requiredNumbers = document.querySelectorAll('input[type="number"][required]');
+    requiredNumbers.forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === '-' || e.key === 'Minus') {
+                e.preventDefault();
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'กรุณากรอกตัวเลขเท่านั้น',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return false;
+            }
+        });
+    });
 }
 
 // ==================== Photo Upload ====================
@@ -1147,9 +1196,24 @@ function collectFormData() {
     return data;
 }
 
+// แก้ไขฟังก์ชัน getValue() 
 function getValue(id) {
     const element = document.getElementById(id);
-    return element ? element.value : '';
+    if (!element) return '';
+    
+    let value = element.value;
+    
+    // 🔥 แก้ปัญหา: ถ้าเป็น "-" หรือค่าว่าง ให้คืนค่าว่าง
+    if (value === '-' || value === '—' || value === 'ไม่มี' || value === 'ไม่ระบุ') {
+        return '';
+    }
+    
+    // 🔥 สำหรับ input type="number" ที่มีค่าไม่ valid
+    if (element.type === 'number' && value && isNaN(value)) {
+        return '';
+    }
+    
+    return value.trim();
 }
 
 function getChecked(id) {

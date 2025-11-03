@@ -745,3 +745,18 @@ body {
 .border-kpi-gold {
     border-color: var(--kpi-gold);
 }
+
+/* เพิ่มใน style.css */
+input[type="number"]::placeholder,
+input[type="text"]::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* แสดงข้อความช่วยเหลือ */
+.form-help-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+    font-style: italic;
+}

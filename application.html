@@ -117,6 +117,7 @@
                     id="salary"
                     name="salary"
                     required
+                    placeholder="ตัวเลข"
                   />
                 </div>
               </div>
@@ -230,7 +231,9 @@
                     class="form-control no-spin"
                     id="age"
                     name="age"
+                    placeholder="ตัวเลข"
                   />
+                  <small class="form-text text-muted">กรอกตัวเลข หรือเว้นว่าง</small>
                 </div>
                 <div class="col-md-3">
                   <label class="form-label">น้ำหนัก (กก.)</label>
@@ -239,6 +242,7 @@
                     class="form-control no-spin"
                     id="weight"
                     name="weight"
+                    placeholder="ตัวเลข"
                   />
                 </div>
                 <div class="col-md-3">
@@ -248,13 +252,14 @@
                     class="form-control no-spin"
                     id="height"
                     name="height"
+                    placeholder="ตัวเลข"
                   />
                 </div>
               </div>
 
               <div class="row mb-3">
                 <div class="col-md-6">
-                  <label class="form-label required">ภูมิลำเนา</label>
+                  <label class="form-label required">ภูมิลำเนา (จังหวัด)</label>
                   <input
                     type="text"
                     class="form-control"
@@ -410,6 +415,7 @@
                     class="form-control"
                     id="email"
                     name="email"
+                    placeholder="กรุณาระบุอีเมลที่ใช้งานได้จริง"
                     required
                   />
                 </div>
@@ -527,6 +533,7 @@
                     class="form-control"
                     id="contactpersonEmail"
                     name="contactpersonEmail"
+                    placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                   />
                 </div>
               </div>
@@ -633,6 +640,7 @@
                     class="form-control no-spin"
                     id="expectedgraduationYear"
                     name="expectedgraduationYear"
+                    placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                   />
                 </div>
               </div>
@@ -797,9 +805,10 @@
                   <label class="form-label">อายุ</label>
                   <input
                     type="number"
-                    class="form-control"
+                    class="form-control no-spin"
                     id="fatherAge"
                     name="fatherAge"
+                    placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                   />
                 </div>
                 <div class="col-md-4">
@@ -846,12 +855,13 @@
                   />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">อายุ</label>
+                  <label class="form-label no-spin">อายุ</label>
                   <input
                     type="number"
                     class="form-control"
                     id="motherAge"
                     name="motherAge"
+                    placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                   />
                 </div>
                 <div class="col-md-4">
@@ -898,12 +908,13 @@
                   />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">อายุ</label>
+                  <label class="form-label no-spin">อายุ</label>
                   <input
                     type="number"
-                    class="form-control"
+                    class="form-control no-spin"
                     id="husbandwifeAge"
                     name="husbandwifeAge"
+                    placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                   />
                 </div>
                 <div class="col-md-4">
@@ -943,10 +954,11 @@
                 <label class="form-label">จำนวนพี่น้อง (ไม่รวมตัวเอง)</label>
                 <input
                   type="number"
-                  class="form-control"
+                  class="form-control no-spin"
                   id="numberofSiblings"
                   name="numberofSiblings"
                   min="0"
+                  placeholder="หากไม่ทราบ กรุณาเว้นว่างไว้"
                 />
               </div>
 
@@ -982,7 +994,7 @@
                   <label class="form-label">จำนวนบุตร</label>
                   <input
                     type="number"
-                    class="form-control"
+                    class="form-control no-spin"
                     id="numberofChildren"
                     name="numberofChildren"
                     min="0"

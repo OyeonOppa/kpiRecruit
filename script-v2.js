@@ -106,50 +106,75 @@ function initializeForm() {
     showStep(currentStep);
 }
 
-// เพิ่มฟังก์ชันนี้หลังจาก initializeForm()
-function preventInvalidNumberInput() {
+// 🔥 สร้างฟังก์ชันแยกเพื่อเรียกใช้ซ้ำได้
+function setupNumberInputPrevention() {
     // หา number inputs ทั้งหมดที่ไม่ required
     const numberInputs = document.querySelectorAll('input[type="number"]:not([required])');
     
     numberInputs.forEach(input => {
-        // เพิ่ม event เพื่อลบ "-" ทันทีที่พิมพ์
+        // เช็คว่าได้ติด listener แล้วหรือยัง
+        if (input.dataset.preventionAdded) return;
+        input.dataset.preventionAdded = 'true';
+        
+        // ป้องกันการพิมพ์ "-"
         input.addEventListener('keydown', function(e) {
-            // ถ้ากด "-" ให้ป้องกัน
             if (e.key === '-' || e.key === 'Minus') {
                 e.preventDefault();
                 return false;
             }
         });
         
+        // ลบ "-" ถ้ามีการ paste เข้ามา
         input.addEventListener('input', function(e) {
-            // ถ้ามีค่าเป็น "-" ให้ลบทิ้ง
             if (this.value === '-' || this.value === '—') {
                 this.value = '';
             }
+            // ลบตัวอักษรที่ไม่ใช่ตัวเลข
+            this.value = this.value.replace(/[^0-9.]/g, '');
         });
         
         // เพิ่ม placeholder
         if (!input.placeholder) {
-            input.placeholder = 'ไม่ระบุ';
+            input.placeholder = 'หากไม่ทราบ กรุณาเว้นว่างไว้';
         }
     });
     
-    // สำหรับ required fields
+    // สำหรับ required fields - ป้องกัน "-" และแจ้งเตือน
     const requiredNumbers = document.querySelectorAll('input[type="number"][required]');
     requiredNumbers.forEach(input => {
+        // เช็คว่าได้ติด listener แล้วหรือยัง
+        if (input.dataset.preventionAdded) return;
+        input.dataset.preventionAdded = 'true';
+        
         input.addEventListener('keydown', function(e) {
             if (e.key === '-' || e.key === 'Minus') {
                 e.preventDefault();
-                Swal.fire({
+                
+                // แสดง toast warning
+                const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
-                    icon: 'warning',
-                    title: 'กรุณากรอกตัวเลขเท่านั้น',
                     showConfirmButton: false,
-                    timer: 2000
+                    timer: 2000,
+                    timerProgressBar: true,
                 });
+                
+                Toast.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกตัวเลขเท่านั้น'
+                });
+                
                 return false;
             }
+        });
+        
+        // ลบค่าที่ไม่ valid
+        input.addEventListener('input', function(e) {
+            if (this.value === '-' || this.value === '—') {
+                this.value = '';
+            }
+            // ลบตัวอักษรที่ไม่ใช่ตัวเลข
+            this.value = this.value.replace(/[^0-9.]/g, '');
         });
     });
 }
@@ -340,7 +365,9 @@ function getNextAvailableId(activeSet) {
     return id;
 }
 
-// Education
+// ==================== แก้ไขฟังก์ชัน add* ทั้งหมดให้เรียก setupNumberInputPrevention() ====================
+
+// แก้ไข addEducation()
 function addEducation() {
     if (activeEducationIds.size >= 4) {
         Swal.fire({
@@ -379,11 +406,11 @@ function addEducation() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label ${requiredClass}">ตั้งแต่ปี (พ.ศ.)</label>
-                    <input type="number" class="form-control no-spin" id="eduSincetheyear${newId}" name="eduSincetheyear${newId}" ${requiredAttr}>
+                    <input type="number" class="form-control no-spin" id="eduSincetheyear${newId}" name="eduSincetheyear${newId}" ${requiredAttr} placeholder="เช่น 2560">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label ${requiredClass}">จนถึงปี (พ.ศ.)</label>
-                    <input type="number" class="form-control no-spin" id="eduUntiltheyear${newId}" name="eduUntiltheyear${newId}" ${requiredAttr}>
+                    <input type="number" class="form-control no-spin" id="eduUntiltheyear${newId}" name="eduUntiltheyear${newId}" ${requiredAttr} placeholder="เช่น 2564">
                 </div>
             </div>
             <div class="row mb-2">
@@ -403,13 +430,19 @@ function addEducation() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">GPA</label>
-                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}">
+                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}" placeholder="เช่น 3.50">
                 </div>
             </div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+    
+    // 🔥 เรียก setup ใหม่หลังเพิ่ม elements
+    setupNumberInputPrevention();
 }
+
+// เพิ่มบรรทัดนี้ในฟังก์ชัน addExperience(), addTraining(), addSibling(), addReference() ด้วย
+// ต่อท้ายก่อน closing brace
 
 function removeEducation(id) {
     if (id === 1) {
@@ -531,6 +564,9 @@ function addExperience() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+
+        // 🔥 เพิ่มบรรทัดนี้
+    setupNumberInputPrevention();
 }
 
 function removeExperience(id) {
@@ -600,6 +636,9 @@ function addTraining() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+
+        // 🔥 เพิ่มบรรทัดนี้
+    setupNumberInputPrevention();
 }
 
 function removeTraining(id) {
@@ -770,6 +809,9 @@ function addSibling() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+
+        // 🔥 เพิ่มบรรทัดนี้
+    setupNumberInputPrevention();
 }
 
 function removeSibling(id) {
@@ -839,6 +881,9 @@ function addReference() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
+
+        // 🔥 เพิ่มบรรทัดนี้
+    setupNumberInputPrevention();
 }
 
 function removeReference(id) {
@@ -915,26 +960,92 @@ function showStep(step) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ==================== แก้ไข validateStep() ให้เช็คดีขึ้น ====================
 function validateStep(step) {
     const stepElement = document.getElementById(`step${step}`);
     const requiredFields = stepElement.querySelectorAll('[required]');
     
     for (let field of requiredFields) {
+        // ข้าม field ที่ซ่อนอยู่
         if (field.offsetParent === null) continue;
         
-        if (!field.value.trim()) {
-            Swal.fire({
-                title: 'ข้อมูลไม่ครบถ้วน',
-                text: `กรุณากรอก "${field.previousElementSibling?.textContent || 'ข้อมูล'}" ให้ครบถ้วนก่อนดำเนินการต่อ`,
-                icon: 'warning',
-                confirmButtonColor: '#0f5132',
-                confirmButtonText: 'ตกลง'
-            });
-            field.focus();
-            return false;
+        const label = field.previousElementSibling?.textContent || field.placeholder || 'ข้อมูล';
+        const value = field.value.trim();
+        
+        // 🔥 ตรวจสอบว่าเป็น number input
+        if (field.type === 'number') {
+            // ถ้าค่าว่าง
+            if (!value) {
+                Swal.fire({
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: `กรุณากรอก "${label}" ให้ครบถ้วนก่อนดำเนินการต่อ`,
+                    icon: 'warning',
+                    confirmButtonColor: '#0f5132',
+                    confirmButtonText: 'ตกลง'
+                });
+                field.focus();
+                return false;
+            }
+            
+            // ถ้ามีค่าแต่ไม่ใช่ตัวเลข
+            if (isNaN(value) || value === '-' || value === '—') {
+                Swal.fire({
+                    title: 'ข้อมูลไม่ถูกต้อง',
+                    text: `กรุณากรอก "${label}" เป็นตัวเลขเท่านั้น (ห้ามใส่ "-" หรือตัวอักษร)`,
+                    icon: 'warning',
+                    confirmButtonColor: '#0f5132',
+                    confirmButtonText: 'ตกลง'
+                });
+                field.value = ''; // ลบค่าที่ผิด
+                field.focus();
+                return false;
+            }
+        } 
+        // 🔥 ตรวจสอบ email format
+        else if (field.type === 'email') {
+            if (!value) {
+                Swal.fire({
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: `กรุณากรอก "${label}" ให้ครบถ้วนก่อนดำเนินการต่อ`,
+                    icon: 'warning',
+                    confirmButtonColor: '#0f5132',
+                    confirmButtonText: 'ตกลง'
+                });
+                field.focus();
+                return false;
+            }
+            
+            // ตรวจสอบ email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(value)) {
+                Swal.fire({
+                    title: 'อีเมลไม่ถูกต้อง',
+                    text: 'กรุณากรอกอีเมลในรูปแบบที่ถูกต้อง เช่น example@email.com',
+                    icon: 'warning',
+                    confirmButtonColor: '#0f5132',
+                    confirmButtonText: 'ตกลง'
+                });
+                field.focus();
+                return false;
+            }
+        } 
+        // ฟิลด์ปกติ
+        else {
+            if (!value) {
+                Swal.fire({
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: `กรุณากรอก "${label}" ให้ครบถ้วนก่อนดำเนินการต่อ`,
+                    icon: 'warning',
+                    confirmButtonColor: '#0f5132',
+                    confirmButtonText: 'ตกลง'
+                });
+                field.focus();
+                return false;
+            }
         }
     }
 
+    // ตรวจสอบรูปถ่าย
     if (step === 1 && !photoData) {
         Swal.fire({
             title: 'ยังไม่มีรูปถ่าย',
@@ -947,6 +1058,7 @@ function validateStep(step) {
         return false;
     }
 
+    // ตรวจสอบประวัติการศึกษา
     if (step === 3) {
         if (activeEducationIds.size < 1) {
             Swal.fire({
@@ -981,7 +1093,6 @@ function validateStep(step) {
 
     return true;
 }
-
 // ==================== Form Submission ====================
 async function handleSubmit(event) {
     event.preventDefault();

@@ -430,7 +430,7 @@ function addEducation() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">GPA</label>
-                    <input type="text" inputmode="decimal" pattern="^\d+(\.\d{1,2})?$" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}" placeholder="เช่น 3.50">
+                    <input type="text" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}" placeholder="เช่น 3.50">
                 </div>
             </div>
         </div>

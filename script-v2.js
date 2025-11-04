@@ -430,7 +430,7 @@ function addEducation() {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">GPA</label>
-                    <input type="number" step="0.01" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}" placeholder="เช่น 3.50">
+                    <input type="text" inputmode="decimal" pattern="^\d+(\.\d{1,2})?$" class="form-control no-spin" id="gpa${newId}" name="gpa${newId}" placeholder="เช่น 3.50">
                 </div>
             </div>
         </div>
@@ -1332,14 +1332,20 @@ function getChecked(id) {
     return element ? element.checked : false;
 }
 
-// ⭐ เก็บข้อมูลจาก Set แทน counter
+// ✅ ฟังก์ชันใหม่ (ถูกต้อง)
 function collectDynamicDataFromSet(prefix, activeSet, fields) {
     const data = {};
     
     activeSet.forEach(id => {
         fields.forEach(field => {
-            let fieldName = field.replace('{i}', id);
-            const fullFieldName = fieldName.includes(prefix) ? fieldName : `${fieldName}${id}`;
+            // ถ้ามี {i} ให้แทนที่ด้วย id
+            let fullFieldName;
+            if (field.includes('{i}')) {
+                fullFieldName = field.replace('{i}', id);
+            } else {
+                // ไม่มี {i} ให้เพิ่ม id ต่อท้าย
+                fullFieldName = `${field}${id}`;
+            }
             data[fullFieldName] = getValue(fullFieldName);
         });
     });

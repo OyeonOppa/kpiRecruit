@@ -25,6 +25,56 @@ let documentsData = {
     houseRegistrationCopy: null
 };
 
+// ==================== Validation Helper ====================
+function isValidNumber(value) {
+    if (!value || value.trim() === '') return true; // ค่าว่างอนุญาต (ถ้าไม่ required)
+    
+    // ตัดช่องว่างหน้าหลัง
+    value = value.trim();
+    
+    // ห้ามพิมพ์อย่างเดียว: จุด, ขีด, e, E, หรือตัวอักษร
+    if (value === '.' || value === '-' || value === 'e' || value === 'E') {
+        return false;
+    }
+    
+    // ห้าม: จุดหลายตัว, ขีดหลายตัว
+    if (value.includes('..') || value.includes('--')) {
+        return false;
+    }
+    
+    // ห้าม: ตัวอักษรปนในตัวเลข (ยกเว้น . และ - ที่ตำแหน่งถูกต้อง)
+    if (/[a-zA-Zก-๙]/.test(value)) {
+        return false;
+    }
+    
+    // ต้องเป็นตัวเลขที่ valid
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+        return false;
+    }
+    
+    return true;
+}
+
+// ==================== Toast Notification ====================
+function showToast(type, message) {
+    // ถ้ามี SweetAlert2
+    if (typeof Swal !== 'undefined') {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+        });
+        
+        Toast.fire({
+            icon: type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info',
+            title: message
+        });
+    }
+}
+
 // Page Load
 window.addEventListener('load', function() {
     if (sessionStorage.getItem('consentAccepted') !== 'true') {
@@ -102,80 +152,107 @@ function initializeForm() {
     // Form submission
     document.getElementById('applicationForm').addEventListener('submit', handleSubmit);
     
-    preventInvalidNumberInput();
+    setupNumberInputPrevention();
     showStep(currentStep);
 }
 
-// 🔥 สร้างฟังก์ชันแยกเพื่อเรียกใช้ซ้ำได้
+// 🔥 ระบบป้องกันการกรอก number input ผิดประเภท
 function setupNumberInputPrevention() {
-    // หา number inputs ทั้งหมดที่ไม่ required
-    const numberInputs = document.querySelectorAll('input[type="number"]:not([required])');
+    const numberInputs = document.querySelectorAll('input[type="number"]');
     
     numberInputs.forEach(input => {
         // เช็คว่าได้ติด listener แล้วหรือยัง
         if (input.dataset.preventionAdded) return;
         input.dataset.preventionAdded = 'true';
         
-        // ป้องกันการพิมพ์ "-"
-        input.addEventListener('keydown', function(e) {
-            if (e.key === '-' || e.key === 'Minus') {
+        // 1. ป้องกันการพิมพ์ตัวอักษร
+        input.addEventListener('keypress', function(e) {
+            const char = String.fromCharCode(e.which || e.keyCode);
+            const currentValue = this.value || '';
+            
+            // อนุญาตเฉพาะ: ตัวเลข 0-9, จุด (.), ขีด (-) ที่ตำแหน่งแรก
+            if (!/[0-9]/.test(char)) {
+                // จุด - อนุญาตถ้ายังไม่มี และไม่ใช่ตัวแรก
+                if (char === '.' && !currentValue.includes('.') && currentValue.length > 0) {
+                    return; // อนุญาต
+                }
+                // ขีด - อนุญาตเฉพาะที่ตำแหน่งแรก
+                if (char === '-' && currentValue.length === 0) {
+                    return; // อนุญาต
+                }
+                // ทุกอย่างอื่น - ห้าม
                 e.preventDefault();
-                return false;
+                showToast('warning', 'กรุณากรอกตัวเลขเท่านั้น');
             }
         });
         
-        // ลบ "-" ถ้ามีการ paste เข้ามา
+        // 2. ตรวจสอบหลังพิมพ์หรือ paste
         input.addEventListener('input', function(e) {
-            if (this.value === '-' || this.value === '—') {
-                this.value = '';
+            let value = this.value;
+            
+            if (!value) return;
+            
+            // ลบตัวอักษรที่ไม่ใช่ตัวเลข, จุด, หรือขีด
+            let cleaned = value.replace(/[^0-9.-]/g, '');
+            
+            // จัดการจุด - เก็บได้แค่ตัวแรก
+            const parts = cleaned.split('.');
+            if (parts.length > 2) {
+                cleaned = parts[0] + '.' + parts.slice(1).join('');
             }
-            // ลบตัวอักษรที่ไม่ใช่ตัวเลข
-            this.value = this.value.replace(/[^0-9.]/g, '');
+            
+            // จัดการขีด - เก็บได้แค่ตัวแรกที่หน้าสุด
+            if (cleaned.indexOf('-') > 0) {
+                cleaned = cleaned.replace(/-/g, '');
+            }
+            if (cleaned.split('-').length > 2) {
+                cleaned = '-' + cleaned.replace(/-/g, '');
+            }
+            
+            // ตรวจสอบค่าที่ไม่ valid
+            if (cleaned !== value) {
+                this.value = cleaned;
+                showToast('warning', 'มีการแก้ไขค่าที่ไม่ถูกต้องอัตโนมัติ');
+            }
+            
+            // ถ้าเป็นค่าที่ยัง invalid (เช่น "-" หรือ "." เพียงอย่างเดียว)
+            if (cleaned && !isValidNumber(cleaned) && cleaned !== '-' && cleaned !== '.') {
+                this.value = '';
+                showToast('error', 'ค่าที่กรอกไม่ถูกต้อง กรุณากรอกใหม่');
+            }
         });
         
-        // เพิ่ม placeholder
-        if (!input.placeholder) {
-            input.placeholder = 'หากไม่ทราบ กรุณาเว้นว่างไว้';
+        // 3. ตรวจสอบเมื่อ blur (เสร็จสิ้นการกรอก)
+        input.addEventListener('blur', function() {
+            const value = this.value.trim();
+            
+            if (!value) return;
+            
+            // ถ้าจบด้วยจุด - ตัดออก
+            if (value.endsWith('.')) {
+                this.value = value.slice(0, -1);
+            }
+            
+            // ถ้าเป็นแค่ "-" - ลบ
+            if (value === '-') {
+                this.value = '';
+                if (this.required) {
+                    showToast('warning', 'กรุณากรอกตัวเลข');
+                }
+            }
+            
+            // ถ้าไม่ valid - เคลียร์
+            if (value && !isValidNumber(value)) {
+                this.value = '';
+                const label = this.previousElementSibling?.textContent || 'ช่องนี้';
+                showToast('error', `${label} ต้องเป็นตัวเลขเท่านั้น`);
+            }
+        });
+        
+        // เพิ่ม placeholder ถ้ายังไม่มี
+        if (!input.placeholder && !input.required) {
+            input.placeholder = 'กรอกตัวเลข หรือเว้นว่างได้';
         }
-    });
-    
-    // สำหรับ required fields - ป้องกัน "-" และแจ้งเตือน
-    const requiredNumbers = document.querySelectorAll('input[type="number"][required]');
-    requiredNumbers.forEach(input => {
-        // เช็คว่าได้ติด listener แล้วหรือยัง
-        if (input.dataset.preventionAdded) return;
-        input.dataset.preventionAdded = 'true';
-        
-        input.addEventListener('keydown', function(e) {
-            if (e.key === '-' || e.key === 'Minus') {
-                e.preventDefault();
-                
-                // แสดง toast warning
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                });
-                
-                Toast.fire({
-                    icon: 'warning',
-                    title: 'กรุณากรอกตัวเลขเท่านั้น'
-                });
-                
-                return false;
-            }
-        });
-        
-        // ลบค่าที่ไม่ valid
-        input.addEventListener('input', function(e) {
-            if (this.value === '-' || this.value === '—') {
-                this.value = '';
-            }
-            // ลบตัวอักษรที่ไม่ใช่ตัวเลข
-            this.value = this.value.replace(/[^0-9.]/g, '');
-        });
     });
 }
 
@@ -365,9 +442,7 @@ function getNextAvailableId(activeSet) {
     return id;
 }
 
-// ==================== แก้ไขฟังก์ชัน add* ทั้งหมดให้เรียก setupNumberInputPrevention() ====================
-
-// แก้ไข addEducation()
+// Education
 function addEducation() {
     if (activeEducationIds.size >= 4) {
         Swal.fire({
@@ -440,9 +515,6 @@ function addEducation() {
     // 🔥 เรียก setup ใหม่หลังเพิ่ม elements
     setupNumberInputPrevention();
 }
-
-// เพิ่มบรรทัดนี้ในฟังก์ชัน addExperience(), addTraining(), addSibling(), addReference() ด้วย
-// ต่อท้ายก่อน closing brace
 
 function removeEducation(id) {
     if (id === 1) {
@@ -564,8 +636,6 @@ function addExperience() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
-
-        // 🔥 เพิ่มบรรทัดนี้
     setupNumberInputPrevention();
 }
 
@@ -636,8 +706,6 @@ function addTraining() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
-
-        // 🔥 เพิ่มบรรทัดนี้
     setupNumberInputPrevention();
 }
 
@@ -789,7 +857,7 @@ function addSibling() {
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">อายุ</label>
-                    <input type="number" class="form-control" id="siblingAge${newId}" name="siblingAge${newId}">
+                    <input type="number" class="form-control no-spin" id="siblingAge${newId}" name="siblingAge${newId}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">อาชีพ</label>
@@ -809,8 +877,6 @@ function addSibling() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
-
-        // 🔥 เพิ่มบรรทัดนี้
     setupNumberInputPrevention();
 }
 
@@ -881,8 +947,6 @@ function addReference() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
-
-        // 🔥 เพิ่มบรรทัดนี้
     setupNumberInputPrevention();
 }
 
@@ -960,21 +1024,41 @@ function showStep(step) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ==================== แก้ไข validateStep() ให้เช็คดีขึ้น ====================
+// ==================== Validation ====================
 function validateStep(step) {
     const stepElement = document.getElementById(`step${step}`);
     const requiredFields = stepElement.querySelectorAll('[required]');
     
+    // ⭐ เช็ค number fields ทั้งหมดในหน้านี้ก่อน (ทั้ง required และไม่ required)
+    const allNumberFields = stepElement.querySelectorAll('input[type="number"]');
+    for (let field of allNumberFields) {
+        if (field.offsetParent === null) continue; // ข้ามที่ซ่อนอยู่
+        
+        const value = field.value.trim();
+        if (value && !isValidNumber(value)) {
+            const label = field.previousElementSibling?.textContent || field.placeholder || 'ข้อมูล';
+            Swal.fire({
+                title: 'ข้อมูลไม่ถูกต้อง',
+                html: `<strong>${label}</strong><br>กรุณากรอกตัวเลขที่ถูกต้อง<br><small>ห้ามใส่เฉพาะจุด (.) หรือขีด (-) หรือตัวอักษร</small>`,
+                icon: 'error',
+                confirmButtonColor: '#0f5132',
+                confirmButtonText: 'แก้ไข'
+            });
+            field.focus();
+            field.select();
+            return false;
+        }
+    }
+    
+    // ตรวจสอบ required fields
     for (let field of requiredFields) {
-        // ข้าม field ที่ซ่อนอยู่
         if (field.offsetParent === null) continue;
         
         const label = field.previousElementSibling?.textContent || field.placeholder || 'ข้อมูล';
         const value = field.value.trim();
         
-        // 🔥 ตรวจสอบว่าเป็น number input
+        // ช่อง number
         if (field.type === 'number') {
-            // ถ้าค่าว่าง
             if (!value) {
                 Swal.fire({
                     title: 'ข้อมูลไม่ครบถ้วน',
@@ -987,21 +1071,20 @@ function validateStep(step) {
                 return false;
             }
             
-            // ถ้ามีค่าแต่ไม่ใช่ตัวเลข
-            if (isNaN(value) || value === '-' || value === '—') {
+            if (!isValidNumber(value)) {
                 Swal.fire({
                     title: 'ข้อมูลไม่ถูกต้อง',
-                    text: `กรุณากรอก "${label}" เป็นตัวเลขเท่านั้น (ห้ามใส่ "-" หรือตัวอักษร)`,
-                    icon: 'warning',
+                    html: `<strong>${label}</strong><br>กรุณากรอกตัวเลขที่ถูกต้อง`,
+                    icon: 'error',
                     confirmButtonColor: '#0f5132',
-                    confirmButtonText: 'ตกลง'
+                    confirmButtonText: 'แก้ไข'
                 });
-                field.value = ''; // ลบค่าที่ผิด
+                field.value = '';
                 field.focus();
                 return false;
             }
         } 
-        // 🔥 ตรวจสอบ email format
+        // ช่อง email
         else if (field.type === 'email') {
             if (!value) {
                 Swal.fire({
@@ -1015,7 +1098,6 @@ function validateStep(step) {
                 return false;
             }
             
-            // ตรวจสอบ email format
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(value)) {
                 Swal.fire({
@@ -1093,9 +1175,49 @@ function validateStep(step) {
 
     return true;
 }
+
 // ==================== Form Submission ====================
 async function handleSubmit(event) {
     event.preventDefault();
+
+    // ⭐ Final validation - เช็คทุกฟิลด์อีกครั้ง
+    console.log('🔍 Running final validation...');
+    
+    const allNumberFields = document.querySelectorAll('input[type="number"]');
+    let hasInvalidField = false;
+    let firstInvalidField = null;
+    
+    for (let field of allNumberFields) {
+        if (field.offsetParent === null) continue;
+        
+        const value = field.value.trim();
+        if (value && !isValidNumber(value)) {
+            hasInvalidField = true;
+            if (!firstInvalidField) {
+                firstInvalidField = field;
+            }
+            console.error(`Invalid field: ${field.id} = "${value}"`);
+        }
+    }
+    
+    if (hasInvalidField && firstInvalidField) {
+        const label = firstInvalidField.previousElementSibling?.textContent || 'ช่องนี้';
+        
+        Swal.fire({
+            title: 'พบข้อมูลไม่ถูกต้อง',
+            html: `มีช่องที่กรอกข้อมูลไม่ถูกต้อง<br><br><strong>${label}</strong><br><small>กรุณากรอกตัวเลขที่ถูกต้อง</small>`,
+            icon: 'error',
+            confirmButtonColor: '#0f5132',
+            confirmButtonText: 'แก้ไข'
+        });
+        
+        // Scroll ไปที่ field ที่ผิด
+        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalidField.focus();
+        firstInvalidField.select();
+        
+        return;
+    }
 
     if (!document.getElementById('confirmData').checked) {
         Swal.fire({
@@ -1314,17 +1436,26 @@ function getValue(id) {
     
     let value = element.value;
     
+    // ลบช่องว่างหน้าหลัง
+    value = value.trim();
+    
     // 🔥 แก้ปัญหา: ถ้าเป็น "-" หรือค่าว่าง ให้คืนค่าว่าง
     if (value === '-' || value === '—' || value === 'ไม่มี' || value === 'ไม่ระบุ') {
         return '';
     }
     
-    // 🔥 สำหรับ input type="number" ที่มีค่าไม่ valid
-    if (element.type === 'number' && value && isNaN(value)) {
-        return '';
+    // 🔥 สำหรับ input type="number" - validate และแปลงค่า
+    if (element.type === 'number') {
+        if (!isValidNumber(value)) {
+            console.warn(`Invalid number in field ${id}: "${value}"`);
+            return '';
+        }
+        // แปลงเป็น string ของตัวเลข (ตัด leading zeros)
+        const num = parseFloat(value);
+        return isNaN(num) ? '' : num.toString();
     }
     
-    return value.trim();
+    return value;
 }
 
 function getChecked(id) {
@@ -1332,7 +1463,7 @@ function getChecked(id) {
     return element ? element.checked : false;
 }
 
-// ✅ ฟังก์ชันใหม่ (ถูกต้อง)
+// ✅ ฟังก์ชันเก็บข้อมูลจาก active IDs
 function collectDynamicDataFromSet(prefix, activeSet, fields) {
     const data = {};
     
